@@ -18,19 +18,9 @@ const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.MEDIA_PORT || 8000;
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : [];
-
 const io = new Server(httpServer, {
   cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true,
   },

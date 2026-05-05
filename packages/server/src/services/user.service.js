@@ -57,7 +57,7 @@ const userService = {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '30m' }
+      { expiresIn: '7d' }
     );
 
     return {

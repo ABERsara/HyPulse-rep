@@ -193,6 +193,8 @@ export const registerStreamHandlers = (io, socket) => {
       // 3. יצירת ה-Producer
       const producer = await transport.produce({ kind, rtpParameters });
       producers[producer.id] = producer;
+      if (!streamRoom.producers) streamRoom.producers = {};
+      streamRoom.producers[producer.id] = producer;
 
       // 4. בדיקת תפקיד והפעלת FFmpeg
       const role = await validateParticipantRole(streamId, socket.user.id);
@@ -277,9 +279,10 @@ export const registerStreamHandlers = (io, socket) => {
       const streamRoom = streams[streamId];
       if (!streamRoom) return callback({ error: 'Stream is not live yet' });
       socket.join(streamId);
+      const producerIds = Object.keys(streamRoom.producers || {});
       callback({
         rtpCapabilities: streamRoom.router.rtpCapabilities,
-        currentProducerId: streamRoom.producerId || null,
+        producerIds,
       });
     } catch (error) {
       callback({ error: error.message });

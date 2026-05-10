@@ -45,13 +45,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-     [
-    "@config-plugins/react-native-webrtc", 
-    {
-      "cameraPermission": "Allow WorldPlay to access your camera",
-      "microphonePermission": "Allow WorldPlay to access your microphone"
-    }
-  ],
       [
         "expo-splash-screen",
         {

@@ -34,8 +34,8 @@ async function cancelOldGames(userId) {
 
 const gameService = {
   async createGame(userId, { title, description, moderatorId }) {
-    await gameRules.validateHostIsAvailable(userId);
     await cancelOldGames(userId);
+    await gameRules.validateHostIsAvailable(userId);
 
     return await prisma.$transaction(async (tx) => {
       const newStream = await tx.stream.create({

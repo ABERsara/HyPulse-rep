@@ -46,34 +46,39 @@ export default function HostTestScreen() {
       });
       setLocalStream(stream);
 
+      setLocalStatus('יוצר משחק...');
       const response = await emitPromise(SOCKET_EVENTS.GAME.CREATE, {
         title: 'Live Stream',
       });
       if (response.error) throw new Error(response.error);
 
-      // שימוש ב-Destructuring נכון בלי להכריז פעמיים
       const { streamId, gameId } = response;
       setCurrentGameId(gameId);
 
+      setLocalStatus('מחבר לשרת מדיה...');
       const roomData = await emitMediaPromise(
         SOCKET_EVENTS.STREAM.CREATE_ROOM,
         { streamId }
       );
+
+      setLocalStatus('טוען מכשיר WebRTC...');
       await MediasoupManager.initDevice(roomData.rtpCapabilities);
 
+      setLocalStatus('יוצר transport...');
       const transport = await MediasoupManager.createTransport(
         socket,
         'send',
         streamId
       );
 
+      setLocalStatus('שולח וידאו...');
       if (stream.getVideoTracks()[0])
         await transport.produce({ track: stream.getVideoTracks()[0] });
       if (stream.getAudioTracks()[0])
         await transport.produce({ track: stream.getAudioTracks()[0] });
 
-      // עדכון סטטוס ל-ACTIVE
-      await emitPromise(SOCKET_EVENTS.GAME.UPDATE_STATUS, {
+      setLocalStatus('מעדכן סטטוס...');
+      await emitPromise(SOCKET_EVENTS.GAME.STATUS_UPDATE, {
         gameId,
         status: 'ACTIVE',
       });
@@ -92,7 +97,7 @@ export default function HostTestScreen() {
     }
 
     // שליחה לשרת - זה מה שיפעיל את כל שרשרת הניקוי ב-DB ובמדיה
-    await emitPromise(SOCKET_EVENTS.GAME.UPDATE_STATUS, {
+    await emitPromise(SOCKET_EVENTS.GAME.STATUS_UPDATE, {
       gameId: currentGameId,
       status: 'FINISHED',
     });

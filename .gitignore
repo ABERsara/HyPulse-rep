@@ -37,6 +37,12 @@ Thumbs.db
 
 # Local scripts
 test.sh
+proxy.js
+TIP.txt
+
+# Database backups
+*.sql
+backup*.sql
 
 # Postman
 postman/

@@ -1,12 +1,12 @@
 // packages/shared/src/constants/socketEvents.js
 
 export const SOCKET_EVENTS = {
-  // אירועי מערכת כלליים
+  // General system events
   SYSTEM: {
     DISCONNECT: 'disconnect',
     ERROR: 'error',
   },
-  // משחק (App-Server)
+  // Game events (App-Server)
   GAME: {
     CREATE: 'game:create',
     JOIN: 'game:join_room',
@@ -21,7 +21,7 @@ export const SOCKET_EVENTS = {
     ERROR: 'game:error',
   },
 
-  // מדיה (Media-Server / Mediasoup)
+  // Stream events (Media-Server / Mediasoup)
   STREAM: {
     CREATE_ROOM: 'stream:create_room',
     INIT_BROADCAST: 'stream:init_broadcast',

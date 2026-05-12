@@ -1,12 +1,11 @@
 /**
  * auth.service.js
  *
- * שכבת השירות לניהול אימות משתמשים.
- * מטפל בהתחברות, התנתקות ושמירת טוקן ב-AsyncStorage.
+ * Authentication service — handles login, logout, and token storage in AsyncStorage.
  *
- * מתקשר עם: /api/users  (login)
- * תלוי ב:   AsyncStorage (שמירת טוקן), fetch (בקשות HTTP)
- * משמש את:  AuthContext ומסך ההתחברות
+ * Communicates with: /api/users (login)
+ * Depends on: AsyncStorage (token storage), fetch (HTTP requests)
+ * Used by: LoginScreen and any screen that needs the current auth token
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
@@ -52,7 +51,7 @@ export const authService = {
     try {
       await AsyncStorage.removeItem('userToken');
     } catch {
-      // אין מה לעשות אם הסרת הטוקן נכשלה
+      // nothing to do if token removal failed
     }
   },
 };

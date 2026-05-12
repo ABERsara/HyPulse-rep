@@ -13,15 +13,15 @@ export default function BroadcastScreen() {
   const [localStream] = useState(null);
   const [remoteStream] = useState(null);
   const [isLive, setIsLive] = useState(false);
-  const [status, setStatus] = useState('מחובר למערכת');
+  const [status, setStatus] = useState('Connected');
 
   const initMedia = async () => {
     try {
-      setStatus('מבקש גישה למצלמה...');
+      setStatus('Requesting camera access...');
       const stream = null;
       return stream;
     } catch (e) {
-      setStatus('שגיאת מצלמה');
+      setStatus('Camera error');
       throw e;
     }
   };
@@ -29,18 +29,18 @@ export default function BroadcastScreen() {
   const startBroadcast = async () => {
     try {
       await initMedia();
-      setStatus('מתחבר לשרת המדיה...');
+      setStatus('Connecting to media server...');
 
       const { streamId } = await emitPromise('stream:init_broadcast', {
-        title: 'שידור מנחים',
+        title: 'Moderator broadcast',
       });
       await emitPromise('stream:create_room', { streamId });
 
       setIsLive(true);
-      setStatus('שידור חי (לא מוקלט) - WebRTC Disabled');
+      setStatus('Live (not recorded) - WebRTC Disabled');
     } catch (err) {
       console.error(err);
-      setStatus('שגיאה בחיבור');
+      setStatus('Connection error');
     }
   };
 
@@ -69,17 +69,17 @@ export default function BroadcastScreen() {
         <Text style={styles.statusText}>{status}</Text>
       </View>
       <View style={styles.splitGrid}>
-        <VideoSlot stream={localStream} label="את/ה (מנחה 1)" />
-        <VideoSlot stream={remoteStream} label="מנחה 2 (ממתין...)" isRemote />
+        <VideoSlot stream={localStream} label="You (Moderator 1)" />
+        <VideoSlot stream={remoteStream} label="Moderator 2 (waiting...)" isRemote />
       </View>
       <View style={styles.controls}>
         {!isLive ? (
           <TouchableOpacity style={styles.btnStart} onPress={startBroadcast}>
-            <Text style={styles.btnText}>התחל שידור מנחים</Text>
+            <Text style={styles.btnText}>Start Broadcast</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={styles.btnStop} onPress={() => {}}>
-            <Text style={styles.btnText}>עצור שידור</Text>
+            <Text style={styles.btnText}>Stop Broadcast</Text>
           </TouchableOpacity>
         )}
       </View>

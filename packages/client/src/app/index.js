@@ -31,7 +31,7 @@ export default function Page() {
         style={styles.backBtn}
         onPress={() => setCurrentScreen('HOME')}
       >
-        <Text style={styles.backText}>⬅️ חזרה לבית</Text>
+        <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
     </View>
@@ -40,7 +40,7 @@ export default function Page() {
   if (currentScreen === 'SHOP') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
-        {renderHeader('חנות ויתרות')}
+        {renderHeader('Coin Store')}
         <ShopScreen userId={user.id} onLogout={() => setUser(null)} />
       </SafeAreaView>
     );
@@ -49,7 +49,7 @@ export default function Page() {
   if (currentScreen === 'GAME') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
-        {renderHeader('משחק פעיל')}
+        {renderHeader('Active Game')}
         <GameScreen />
       </SafeAreaView>
     );
@@ -58,7 +58,7 @@ export default function Page() {
   if (currentScreen === 'HOST_TEST') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
-        {renderHeader('טסט מארח')}
+        {renderHeader('Host Test')}
         <HostTestScreen />
       </SafeAreaView>
     );
@@ -67,7 +67,7 @@ export default function Page() {
   if (currentScreen === 'INBOX') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#030712' }}>
-        {renderHeader('דואר והתראות')}
+        {renderHeader('Inbox')}
         <InboxScreen />
       </SafeAreaView>
     );
@@ -76,7 +76,7 @@ export default function Page() {
   if (currentScreen === 'HISTORY') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#030712' }}>
-        {renderHeader('היסטוריית משחקים')}
+        {renderHeader('Game History')}
         <HistoryScreen />
       </SafeAreaView>
     );
@@ -85,7 +85,7 @@ export default function Page() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.welcome}>שלום, {user.username} 👋</Text>
+        <Text style={styles.welcome}>Hello, {user.username}</Text>
 
         <TouchableOpacity
           style={styles.menuBtn}
@@ -99,7 +99,7 @@ export default function Page() {
             setCurrentScreen('GAME');
           }}
         >
-          <Text style={styles.btnText}>🎮 כניסה למשחק פעיל (PLAYER)</Text>
+          <Text style={styles.btnText}>Join Active Game (PLAYER)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -109,35 +109,35 @@ export default function Page() {
             setCurrentScreen('HOST_TEST');
           }}
         >
-          <Text style={styles.btnText}>🧪 טסט מארח (HOST)</Text>
+          <Text style={styles.btnText}>Host Test</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.menuBtn, { backgroundColor: '#ffa502' }]}
           onPress={() => setCurrentScreen('SHOP')}
         >
-          <Text style={styles.btnText}>🪙 חנות ויתרות</Text>
+          <Text style={styles.btnText}>Coin Store</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.menuBtn, { backgroundColor: '#60a5fa' }]}
           onPress={() => setCurrentScreen('INBOX')}
         >
-          <Text style={styles.btnText}>📩 דואר והתראות</Text>
+          <Text style={styles.btnText}>Inbox</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.menuBtn, { backgroundColor: '#a78bfa' }]}
           onPress={() => setCurrentScreen('HISTORY')}
         >
-          <Text style={styles.btnText}>📜 היסטוריית משחקים</Text>
+          <Text style={styles.btnText}>Game History</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.logoutBtn}
           onPress={() => setUser(null)}
         >
-          <Text style={styles.logoutText}>יציאה מהחשבון</Text>
+          <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

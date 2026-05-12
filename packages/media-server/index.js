@@ -28,26 +28,23 @@ const io = new Server(httpServer, {
 
 app.use(express.json());
 
-// --- הראוטר לעצירת שידור ---
+// Stop stream endpoint
 app.post('/live/stop/:streamId', async (req, res) => {
   const { streamId } = req.params;
-  logger.info(`🛑 Received stop request for stream: ${streamId}`);
+  logger.info(`Received stop request for stream: ${streamId}`);
 
   try {
-    // קריאה לפונקציה -StreamService
     await StreamService.stopRecording(streamId);
     res
       .status(200)
       .json({ success: true, message: 'Stream stopped and cleaned up' });
   } catch (err) {
-    logger.error(`❌ Failed to stop stream ${streamId}`, err.message);
+    logger.error(`Failed to stop stream ${streamId}`, err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-// הגשת קבצי ה-HLS לצפייה
-// עדכון נתיב הגשת הקבצים (HLS ופוסטרים)
-// שינוי מ-'media_files' ל-'public/streams' כדי להתאים ל-FFmpegService
+// Serve HLS files (segments and playlists)
 app.use('/streams', express.static(path.join(__dirname, 'public', 'streams')));
 
 app.use('/', statusRoutes);

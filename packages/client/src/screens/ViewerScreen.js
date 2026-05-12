@@ -13,22 +13,21 @@ import { MediasoupManager } from '../services/MediasoupManager';
 export default function ViewerScreen() {
   const [remoteStream, setRemoteStream] = useState(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [status, setStatus] = useState('ממתין להזנת מזהה שידור...');
+  const [status, setStatus] = useState('Waiting for stream ID...');
   const [streamIdInput, setStreamIdInput] = useState('');
   const videoRef = useRef(null);
 
-  // 1. האזנה לאירועי סוקט (פעם אחת בלבד בטעינה)
+  // Listen for socket events once on mount
   useEffect(() => {
     const activeSocket = socket || connectSocket();
 
     activeSocket.on('stream:new_producer', ({ producerId }) => {
-      console.log('New producer detected:', producerId);
       consume(producerId, streamIdInput);
     });
 
     activeSocket.on('stream:closed', () => {
       setRemoteStream(null);
-      setStatus('השידור הופסק על ידי המארח');
+      setStatus('Stream ended by host');
     });
 
     return () => {
@@ -37,12 +36,11 @@ export default function ViewerScreen() {
     };
   }, [streamIdInput]);
 
-  // 2. פונקציית הצטרפות (מופעלת בלחיצת כפתור)
   const handleJoinPress = async () => {
-    if (!streamIdInput) return alert('אנא הזיני ID');
+    if (!streamIdInput) return alert('Please enter a stream ID');
 
     try {
-      setStatus('מצטרף לשידור...');
+      setStatus('Joining stream...');
       setHasInteracted(true);
 
       const data = await emitPromise('stream:join', {
@@ -53,15 +51,14 @@ export default function ViewerScreen() {
       if (data.currentProducerId) {
         await consume(data.currentProducerId, streamIdInput);
       } else {
-        setStatus('מחובר. ממתין שהמארח יתחיל להזרים...');
+        setStatus('Connected. Waiting for host to start streaming...');
       }
     } catch (err) {
       console.error('Join error:', err);
-      setStatus('שגיאה: ' + err.message);
+      setStatus('Error: ' + err.message);
     }
   };
 
-  // 3. פונקציית צריכת וידאו (Consume)
   const consume = async (producerId, targetId) => {
     try {
       const caps = MediasoupManager.getRtpCapabilities();
@@ -82,7 +79,7 @@ export default function ViewerScreen() {
       const newStream = new MediaStream([consumer.track]);
 
       setRemoteStream(newStream);
-      setStatus('שידור חי 🔴');
+      setStatus('Live');
 
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
@@ -93,26 +90,26 @@ export default function ViewerScreen() {
         streamId: targetId,
       });
     } catch (err) {
-      console.error('❌ Consume error:', err);
-      setStatus('שגיאה בקבלת הוידאו');
+      console.error('Consume error:', err);
+      setStatus('Error receiving video');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>צופה בשידור</Text>
+      <Text style={styles.title}>Watch Stream</Text>
 
       {!hasInteracted ? (
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="הזיני Stream ID כאן"
+            placeholder="Enter Stream ID"
             placeholderTextColor="#888"
             value={streamIdInput}
             onChangeText={setStreamIdInput}
           />
           <Button
-            title="התחברי לשידור"
+            title="Join Stream"
             onPress={handleJoinPress}
             color="#ff4757"
           />

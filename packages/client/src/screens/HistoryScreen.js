@@ -13,14 +13,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchHistory, togglePin } from '../store/slices/historySlice';
 
 const TABS = [
-  { id: 'all', label: 'הכל' },
-  { id: 'asHost', label: '🎮 פתחתי' },
-  { id: 'asPlayer', label: '👤 השתתפתי' },
+  { id: 'all', label: 'All' },
+  { id: 'asHost', label: 'As Host' },
+  { id: 'asPlayer', label: 'As Player' },
 ];
 
 const GameCard = ({ item, onPin }) => {
   const roleColor = item.relationType === 'HOST' ? '#ffa502' : '#60a5fa';
-  const roleLabel = item.relationType === 'HOST' ? '🎮 מארח' : '👤 שחקן';
+  const roleLabel = item.relationType === 'HOST' ? 'Host' : 'Player';
 
   return (
     <View style={styles.card}>
@@ -37,7 +37,7 @@ const GameCard = ({ item, onPin }) => {
         </View>
         <TouchableOpacity onPress={() => onPin(item.gameId)}>
           <Text style={styles.pinBtn}>
-            {item.isPinned ? '📌 נעוץ' : '📍 נעץ'}
+            {item.isPinned ? 'Pinned' : 'Pin'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -48,19 +48,13 @@ const GameCard = ({ item, onPin }) => {
       </Text>
 
       <View style={styles.breakdown}>
-        <Text style={styles.breakdownTitle}>ניקוד:</Text>
+        <Text style={styles.breakdownTitle}>Score:</Text>
         <View style={styles.breakdownRow}>
-          <Text
-            style={styles.breakdownItem}
-          >{`❓ שאלות: ${item.breakdown?.TRIVIA || 0}`}</Text>
-          <Text
-            style={styles.breakdownItem}
-          >{`🎁 מתנות: ${item.breakdown?.DONATION || 0}`}</Text>
-          <Text
-            style={styles.breakdownItem}
-          >{`⭐ בונוס: ${item.breakdown?.BONUS || 0}`}</Text>
+          <Text style={styles.breakdownItem}>{`Questions: ${item.breakdown?.TRIVIA || 0}`}</Text>
+          <Text style={styles.breakdownItem}>{`Gifts: ${item.breakdown?.DONATION || 0}`}</Text>
+          <Text style={styles.breakdownItem}>{`Bonus: ${item.breakdown?.BONUS || 0}`}</Text>
         </View>
-        <Text style={styles.totalText}>{`סהכ: ${item.total || 0}`}</Text>
+        <Text style={styles.totalText}>{`Total: ${item.total || 0}`}</Text>
       </View>
     </View>
   );
@@ -112,7 +106,7 @@ const HistoryScreen = () => {
 
   return (
     <View style={styles.container}>
-      {error && <Text style={styles.errorText}>{`שגיאה: ${error}`}</Text>}
+      {error && <Text style={styles.errorText}>{`Error: ${error}`}</Text>}
 
       <View style={styles.tabBar}>
         {TABS.map((t) => (
@@ -146,7 +140,7 @@ const HistoryScreen = () => {
           />
         }
         ListEmptyComponent={() => (
-          <Text style={styles.emptyText}>אין משחקים להצגה</Text>
+          <Text style={styles.emptyText}>No games to display</Text>
         )}
       />
     </View>

@@ -8,8 +8,6 @@ import PlayerTestScreen from './player_test';
 export default function GameScreen() {
   const { role } = useSelector((state) => state.gameStream);
 
-  console.log('Current role in GameScreen:', role);
-
   return (
     <View style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
       {role === 'HOST' ? (
@@ -21,7 +19,7 @@ export default function GameScreen() {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <Text style={{ color: 'white' }}>
-            מסך צופה - פתח בדפדפן לבדיקת HLS
+            Viewer screen — open in browser to test HLS
           </Text>
         </View>
       )}

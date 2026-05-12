@@ -4,13 +4,12 @@ import { socket, emitPromise } from '../services/socket.service';
 import { MediasoupManager } from '../services/MediasoupManager';
 
 function PlayerTestScreen() {
-  const [status, setStatus] = useState('ממתין...');
+  const [status, setStatus] = useState('Waiting...');
   const [remoteStreams, setRemoteStreams] = useState([]);
   const streamId = 'live_game_test_123';
 
   useEffect(() => {
     const handleNewProducer = async ({ producerId, role }) => {
-      console.log(`מפיק חדש: ${role}`);
       handleConsume(producerId, role);
     };
 
@@ -20,7 +19,7 @@ function PlayerTestScreen() {
 
   const handleJoinAndStream = async () => {
     try {
-      setStatus('מתחבר...');
+      setStatus('Connecting...');
       const data = await emitPromise('stream:join', {
         streamId,
         role: 'PLAYER',
@@ -32,9 +31,9 @@ function PlayerTestScreen() {
           await handleConsume(p.producerId, p.role);
         }
       }
-      setStatus('משדר וצופה! 🟢');
+      setStatus('Broadcasting and watching!');
     } catch (err) {
-      setStatus('שגיאה: ' + err.message);
+      setStatus('Error: ' + err.message);
     }
   };
 
@@ -53,8 +52,7 @@ function PlayerTestScreen() {
       });
 
       const consumer = await recvTransport.consume(consumeData);
-      // הערה: MediaStream לא קיים ב-Native ישירות ללא הייבוא של webrtc
-      // אז אנחנו שומרים את ה-track לבינתיים
+      // MediaStream is not available natively without the webrtc import — storing the track for now
       setRemoteStreams((prev) => [...prev, { id: consumer.id, role }]);
       await emitPromise('stream:resume', { consumerId: consumer.id, streamId });
     } catch (e) {
@@ -66,14 +64,14 @@ function PlayerTestScreen() {
     <View style={styles.container}>
       <Text style={styles.status}>{status}</Text>
 
-      <Text style={styles.label}>אני (שחקן):</Text>
+      <Text style={styles.label}>You (player):</Text>
       <View style={styles.localVideoBox}>
         <Text style={{ color: '#fff', textAlign: 'center', paddingTop: 50 }}>
           WebRTC Disabled
         </Text>
       </View>
 
-      <Text style={styles.label}>שידור מהמארח:</Text>
+      <Text style={styles.label}>Host broadcast:</Text>
       <ScrollView horizontal style={styles.remoteList}>
         {remoteStreams.map((item) => (
           <View key={item.id} style={styles.remoteVideoBox}>
@@ -87,7 +85,7 @@ function PlayerTestScreen() {
         ))}
       </ScrollView>
 
-      <Button title="הצטרף למשחק" onPress={handleJoinAndStream} />
+      <Button title="Join game" onPress={handleJoinAndStream} />
     </View>
   );
 }

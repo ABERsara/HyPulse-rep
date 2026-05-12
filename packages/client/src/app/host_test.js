@@ -18,7 +18,7 @@ import { SOCKET_EVENTS } from '@worldplay/shared';
 
 export default function HostTestScreen() {
   const [localStream, setLocalStream] = useState(null);
-  const [localStatus, setLocalStatus] = useState('מוכן...');
+  const [localStatus, setLocalStatus] = useState('Ready...');
   const [currentGameId, setCurrentGameId] = useState(null);
 
   const startHosting = async () => {
@@ -39,14 +39,14 @@ export default function HostTestScreen() {
         }
       }
 
-      setLocalStatus('פותח מצלמה...');
+      setLocalStatus('Opening camera...');
       const stream = await mediaDevices.getUserMedia({
         audio: true,
         video: { width: 640, height: 480, frameRate: 30 },
       });
       setLocalStream(stream);
 
-      setLocalStatus('יוצר משחק...');
+      setLocalStatus('Creating game...');
       const response = await emitPromise(SOCKET_EVENTS.GAME.CREATE, {
         title: 'Live Stream',
       });
@@ -55,54 +55,54 @@ export default function HostTestScreen() {
       const { streamId, gameId } = response;
       setCurrentGameId(gameId);
 
-      setLocalStatus('מחבר לשרת מדיה...');
+      setLocalStatus('Connecting to media server...');
       const roomData = await emitMediaPromise(
         SOCKET_EVENTS.STREAM.CREATE_ROOM,
         { streamId }
       );
 
-      setLocalStatus('טוען מכשיר WebRTC...');
+      setLocalStatus('Loading WebRTC device...');
       await MediasoupManager.initDevice(roomData.rtpCapabilities);
 
-      setLocalStatus('יוצר transport...');
+      setLocalStatus('Creating transport...');
       const transport = await MediasoupManager.createTransport(
         socket,
         'send',
         streamId
       );
 
-      setLocalStatus('שולח וידאו...');
+      setLocalStatus('Sending video...');
       if (stream.getVideoTracks()[0])
         await transport.produce({ track: stream.getVideoTracks()[0] });
       if (stream.getAudioTracks()[0])
         await transport.produce({ track: stream.getAudioTracks()[0] });
 
-      setLocalStatus('מעדכן סטטוס...');
+      setLocalStatus('Updating status...');
       await emitPromise(SOCKET_EVENTS.GAME.STATUS_UPDATE, {
         gameId,
         status: 'ACTIVE',
       });
-      setLocalStatus('שידור חי פועל! 🚀');
+      setLocalStatus('Live stream running!');
     } catch (err) {
-      setLocalStatus('שגיאה: ' + err.message);
+      setLocalStatus('Error: ' + err.message);
     }
   };
-  const endStream = async () => {
-    setLocalStatus('מסיים שידור ומנקה...');
 
-    // עצירה מקומית
+  const endStream = async () => {
+    setLocalStatus('Ending stream and cleaning up...');
+
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
       setLocalStream(null);
     }
 
-    // שליחה לשרת - זה מה שיפעיל את כל שרשרת הניקוי ב-DB ובמדיה
+    // Sending to server triggers the full DB + media cleanup chain
     await emitPromise(SOCKET_EVENTS.GAME.STATUS_UPDATE, {
       gameId: currentGameId,
       status: 'FINISHED',
     });
     setCurrentGameId(null);
-    setLocalStatus('השידור הסתיים');
+    setLocalStatus('Stream ended');
   };
 
   return (
@@ -117,14 +117,14 @@ export default function HostTestScreen() {
           />
         ) : (
           <View style={styles.centered}>
-            <Text style={{ color: '#fff' }}>מצלמה כבויה</Text>
+            <Text style={{ color: '#fff' }}>Camera off</Text>
           </View>
         )}
       </View>
       {!localStream ? (
-        <Button title="התחל שידור" onPress={startHosting} color="#ff4757" />
+        <Button title="Start broadcast" onPress={startHosting} color="#ff4757" />
       ) : (
-        <Button title="עצור שידור" onPress={endStream} color="#2f3542" />
+        <Button title="Stop broadcast" onPress={endStream} color="#2f3542" />
       )}
     </View>
   );

@@ -8,11 +8,11 @@ import { SOCKET_EVENTS } from '@worldplay/shared';
 export default function ViewerTestScreen() {
   const [streamId, setStreamId] = useState('');
   const [remoteStream, setRemoteStream] = useState(null);
-  const [status, setStatus] = useState('הזיני Stream ID לצפייה');
+  const [status, setStatus] = useState('Enter a Stream ID to watch');
 
   const startWatching = async () => {
     try {
-      setStatus('מצטרף לשידור...');
+      setStatus('Joining stream...');
 
       const { rtpCapabilities, producerIds } = await emitMediaPromise(
         SOCKET_EVENTS.STREAM.JOIN,
@@ -20,14 +20,14 @@ export default function ViewerTestScreen() {
       );
 
       if (!producerIds || producerIds.length === 0) {
-        setStatus('השידור עוד לא התחיל או אין וידאו');
+        setStatus('Stream has not started yet or has no video');
         return;
       }
 
-      setStatus('טוען מכשיר WebRTC...');
+      setStatus('Loading WebRTC device...');
       await MediasoupManager.initDevice(rtpCapabilities);
 
-      setStatus('יוצר transport...');
+      setStatus('Creating transport...');
       const transport = await MediasoupManager.createTransport(
         mediaSocket,
         'recv',
@@ -38,7 +38,7 @@ export default function ViewerTestScreen() {
       const tracks = [];
 
       for (const producerId of producerIds) {
-        setStatus(`מקבל וידאו...`);
+        setStatus('Receiving video...');
         const consumerData = await emitMediaPromise(SOCKET_EVENTS.STREAM.CONSUME, {
           streamId,
           transportId: transport.id,
@@ -58,9 +58,9 @@ export default function ViewerTestScreen() {
 
       const stream = new MediaStream(tracks);
       setRemoteStream(stream);
-      setStatus('צופה בשידור חי 🎥');
+      setStatus('Watching live stream');
     } catch (err) {
-      setStatus('שגיאה: ' + err.message);
+      setStatus('Error: ' + err.message);
     }
   };
 
@@ -72,12 +72,12 @@ export default function ViewerTestScreen() {
         <>
           <TextInput
             style={styles.input}
-            placeholder="הדבק Stream ID כאן"
+            placeholder="Paste Stream ID here"
             placeholderTextColor="#888"
             value={streamId}
             onChangeText={setStreamId}
           />
-          <Button title="התחל צפייה" onPress={startWatching} color="#2ed573" />
+          <Button title="Start watching" onPress={startWatching} color="#2ed573" />
         </>
       ) : (
         <View style={styles.videoBox}>

@@ -8,7 +8,7 @@ const initialState = {
   viewMode: 'HLS', // 'WebRTC' (low latency) or 'HLS' (buffered)
   hlsUrl: null,
   isPaused: false,
-  isFrozen: false, // האם הנגן צריך לעצור עכשיו בגלל שאלה?
+  isFrozen: false, // true when a question is active and playback should pause
   activeProducers: [], // IDs of video streams (Host + up to 4 players)
 };
 
@@ -16,15 +16,15 @@ const gameStreamSlice = createSlice({
   name: 'gameStream',
   initialState,
   reducers: {
-    // מופעל כשמצטרפים למשחק (מ-Controller joinGame)
+    // Triggered when joining a game (from joinGame action)
     initGameSession: (state, action) => {
       const { gameId, streamId, role } = action.payload;
       state.gameId = gameId;
       state.streamId = streamId;
       state.role = role;
 
-      // מנחה (MODERATOR) תמיד ב-WebRTC. שחקנים ומארח ב-WebRTC לצורך שידור.
-      // צופים (VIEWER) ב-HLS.
+      // MODERATOR always on WebRTC. Players and HOST on WebRTC for broadcasting.
+      // VIEWERs use HLS.
       state.viewMode = role === 'VIEWER' ? 'HLS' : 'WebRTC';
 
       if (state.viewMode === 'HLS') {
@@ -32,13 +32,13 @@ const gameStreamSlice = createSlice({
       }
     },
 
-    // עדכון סטטוס מהסוקט (stream_paused / status_update)
+    // Updated from socket (stream_paused / status_update)
     setStreamStatus: (state, action) => {
       state.status = action.payload;
       state.isPaused = action.payload === 'PAUSE';
     },
 
-    // ניהול המשתתפים שמשדרים וידאו (ה-4 המורשים + מנחה)
+    // Manages which participants are broadcasting video (up to 4 approved + moderator)
     updateActiveStreams: (state, action) => {
       state.activeProducers = action.payload;
     },

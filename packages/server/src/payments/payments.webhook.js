@@ -1,4 +1,4 @@
-// Webhook של Stripe — מאזין לאישור תשלום, מעדכן ארנק ושולח התראה בזמן אמת
+// Stripe webhook — listens for payment confirmation, updates wallet, emits real-time notification
 import Stripe from 'stripe';
 import { PrismaClient } from '@prisma/client';
 
@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const handleWebhook = async (req, res) => {
-  console.log('Webhook hit! Event type:', req.body.type);
   const sig = req.headers['stripe-signature'];
 
   let event;
@@ -17,25 +16,18 @@ export const handleWebhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error('Webhook signature failed:', err.message);
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  console.log(
-    '📬 Full Event Data:',
-    JSON.stringify(event.data.object.metadata)
-  );
+
   if (event.type === 'payment_intent.succeeded') {
     const intent = event.data.object;
 
     const userId = intent.metadata?.userId;
     const baseCoins = Number(intent.metadata?.coins);
 
-    console.log('WEBHOOK RECEIVED:');
-    console.log('userId:', userId);
-    console.log('coins:', baseCoins);
-
     if (!userId || isNaN(baseCoins)) {
-      console.error('Missing or invalid metadata');
+      console.error('Webhook received with missing or invalid metadata');
       return res.status(400).json({ error: 'Missing required metadata' });
     }
 
@@ -67,7 +59,7 @@ export const handleWebhook = async (req, res) => {
             status: 'SUCCESS',
             amount: coinsToAdd,
             currency: 'COIN',
-            description: isFirst ? 'בונוס רכישה ראשונה (פי 2)' : 'רכישת מטבעות',
+            description: isFirst ? 'First purchase bonus (x2)' : 'Coin purchase',
             metadata: {
               stripePaymentIntentId: intent.id,
               isFirstPurchase: isFirst,
@@ -80,38 +72,29 @@ export const handleWebhook = async (req, res) => {
         await tx.notification.create({
           data: {
             userId,
-            title: 'הטעינה הצליחה! 💰',
-            message: `נוספו לחשבונך ${coinsToAdd} מטבעות.${
-              isFirst ? ' כולל בונוס רכישה ראשונה!' : ''
-            }`,
+            title: 'Top-up successful!',
+            message: `${coinsToAdd} coins added to your account.${isFirst ? ' First purchase bonus included!' : ''}`,
           },
         });
 
         return updatedUser;
       });
 
-      console.log(
-        `SUCCESS: User ${userId} now has ${result.walletBalance} coins`
-      );
       const io = req.app.get('io');
       if (io) {
-        // המרת Decimal של Prisma ל-Number
+        // Prisma Decimal must be cast to Number before emitting
         const balanceToSend =
           typeof result.walletBalance === 'object'
             ? parseFloat(result.walletBalance)
             : result.walletBalance;
-
-        console.log(`Emitting wallet update to user ${userId}:`, balanceToSend);
 
         io.to(userId).emit('wallet:updated', {
           newBalance: balanceToSend,
           timestamp: new Date().toISOString(),
           source: 'payment_webhook',
         });
-
-        console.log('✅ Socket event emitted successfully');
       } else {
-        console.warn('Socket.IO instance not found - real-time update skipped');
+        console.warn('Socket.IO instance not found — real-time balance update skipped');
       }
 
       res.status(200).json({
@@ -120,11 +103,10 @@ export const handleWebhook = async (req, res) => {
         newBalance: result.walletBalance,
       });
     } catch (error) {
-      console.error('WEBHOOK ERROR:', error.message);
+      console.error('Webhook processing error:', error.message);
       return res.status(500).json({ error: 'Internal processing error' });
     }
   } else {
-    console.log(`ℹUnhandled event type: ${event.type}`);
     res.json({ received: true });
   }
 };

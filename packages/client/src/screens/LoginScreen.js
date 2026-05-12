@@ -19,7 +19,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('שגיאה', 'נא למלא את כל השדות');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -33,7 +33,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
         username: data.user.username || data.user.email,
       });
     } catch (error) {
-      Alert.alert('שגיאת התחברות', error.message || 'פרטים שגויים');
+      Alert.alert('Login failed', error.message || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -41,12 +41,12 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🎮 WorldPlay</Text>
-      <Text style={styles.subtitle}>התחברות</Text>
+      <Text style={styles.title}>HyPulse</Text>
+      <Text style={styles.subtitle}>Sign In</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="אימייל"
+        placeholder="Email"
         placeholderTextColor="#888"
         value={email}
         onChangeText={setEmail}
@@ -55,7 +55,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="סיסמה"
+        placeholder="Password"
         placeholderTextColor="#888"
         value={password}
         onChangeText={setPassword}
@@ -70,7 +70,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.loginText}>כניסה</Text>
+          <Text style={styles.loginText}>Sign In</Text>
         )}
       </TouchableOpacity>
     </View>

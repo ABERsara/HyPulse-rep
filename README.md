@@ -1,4 +1,4 @@
-# World-Play MonoRepo
+# HyPulse MonoRepo
 
 This repository contains the full-stack code for **World‑Play**, a real-time interactive platform built as a monorepo. All major components are managed under the `packages/` directory to enable shared code, synchronized versioning, and simplified dev workflows.
 

@@ -1,6 +1,6 @@
-# World-Play Backend Server
+# HyPulse Backend Server
 
-Located in `packages/server`, this is the primary API and game orchestration service for the World-Play platform. It manages game logic, user accounts, streaming coordination, real-time updates, and pause/resume game state management through dual-stream architecture.
+Located in `packages/server`, this is the primary API and game orchestration service for the HyPulse platform. It manages game logic, user accounts, streaming coordination, real-time updates, and pause/resume game state management through dual-stream architecture.
 
 ## Overview
 

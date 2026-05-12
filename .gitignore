@@ -40,6 +40,10 @@ test.sh
 
 # Postman
 postman/
+.postman/
+
+# Claude Code (local settings)
+.claude/
 
 # Media files
 *.mp4

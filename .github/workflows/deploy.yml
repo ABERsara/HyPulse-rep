@@ -17,10 +17,12 @@ jobs:
         run: |
           echo "$SSH_KEY" > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
+          CLEAN_HOST=$(echo "$HOST" | tr -d '[:space:]')
+          CLEAN_USER=$(echo "$USER" | tr -d '[:space:]')
           ssh -i /tmp/deploy_key \
             -o StrictHostKeyChecking=no \
             -o BatchMode=yes \
-            $USER@$HOST '
+            $CLEAN_USER@$CLEAN_HOST '
               cd /root/World-Play-Backend &&
               git pull origin main &&
               docker compose up -d --build app-server media-server &&

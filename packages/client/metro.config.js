@@ -13,9 +13,16 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
-// ✅ חדש: mock ל-WebRTC כדי שיעבוד ב-Expo Go
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'react-native-webrtc') {
+    if (platform === 'android' || platform === 'ios') {
+      return context.resolveRequest(
+        context,
+        '@livekit/react-native-webrtc',
+        platform
+      );
+    }
+    // web: use mock (no native WebRTC)
     return {
       filePath: path.resolve(projectRoot, 'src/mocks/webrtc.mock.js'),
       type: 'sourceFile',

@@ -37,6 +37,19 @@ Thumbs.db
 
 # Local scripts
 test.sh
+proxy.js
+TIP.txt
+
+# Database backups
+*.sql
+backup*.sql
+
+# Postman
+postman/
+.postman/
+
+# Claude Code (local settings)
+.claude/
 
 # Media files
 *.mp4

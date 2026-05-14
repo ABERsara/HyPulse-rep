@@ -1,15 +1,15 @@
 /**
  * socket.service.js (client)
  *
- * ניהול חיבורי Socket.IO מהצד הלקוח — שני חיבורים נפרדים:
- *   appSocket   — לשרת הראשי (משחק, התראות, צ'אט)
- *   mediaSocket — לשרת המדיה (סטרימינג וידאו/אודיו)
+ * Manages two separate Socket.IO connections:
+ *   appSocket   — main server (game events, notifications, chat)
+ *   mediaSocket — media server (WebRTC video/audio streaming)
  *
- * connectMediaSocket משתמש ב-promise dedup כדי למנוע חיבורים כפולים במקביל.
- * emitPromise / emitMediaPromise עוטפים emit ב-Promise לשימוש async/await נוח.
+ * connectMediaSocket uses promise dedup to prevent concurrent duplicate connects.
+ * emitPromise / emitMediaPromise wrap emit in a Promise for convenient async/await use.
  *
- * תלוי ב:   auth.service.js (טוקן לאימות), EXPO_PUBLIC_MEDIA_SERVER_URL (ENV)
- * משמש את:  כל מסך שצריך לשלוח/לקבל אירועי realtime
+ * Depends on: auth.service.js (auth token), EXPO_PUBLIC_MEDIA_SERVER_URL (ENV)
+ * Used by: any screen that needs to send/receive realtime events
  */
 import { io } from 'socket.io-client';
 import { authService } from './auth.service';
@@ -81,7 +81,7 @@ export const emitPromise = (type, data) => {
     connectAppSocket()
       .then((activeSocket) => {
         if (!activeSocket || !activeSocket.connected)
-          return reject(new Error('סוקט לא מחובר'));
+          return reject(new Error('App socket not connected'));
         activeSocket.emit(type, data, (response) => {
           if (response && response.error) reject(new Error(response.error));
           else resolve(response);
@@ -96,7 +96,7 @@ export const emitMediaPromise = (type, data) => {
     connectMediaSocket()
       .then((activeSocket) => {
         if (!activeSocket || !activeSocket.connected)
-          return reject(new Error('מדיה סוקט לא מחובר'));
+          return reject(new Error('Media socket not connected'));
         activeSocket.emit(type, data, (response) => {
           if (response && response.error) reject(new Error(response.error));
           else resolve(response);
@@ -105,13 +105,3 @@ export const emitMediaPromise = (type, data) => {
       .catch(reject);
   });
 };
-
-export const disconnectSocket = () => {
-  if (appSocketInstance) appSocketInstance.disconnect();
-  if (mediaSocketInstance) mediaSocketInstance.disconnect();
-};
-
-export const connectSocket = connectAppSocket;
-export const getSocket = () => appSocketInstance;
-
-export { appSocketInstance as socket };

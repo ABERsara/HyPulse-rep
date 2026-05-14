@@ -3,7 +3,6 @@ import { authService } from '../../services/auth.service';
 
 const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL}/api`;
 
-// שליפת היסטוריה
 export const fetchHistory = createAsyncThunk(
   'history/fetchHistory',
   async (_, { rejectWithValue }) => {
@@ -21,7 +20,6 @@ export const fetchHistory = createAsyncThunk(
   }
 );
 
-// נעיצת משחק
 export const togglePin = createAsyncThunk(
   'history/togglePin',
   async (gameId, { rejectWithValue }) => {
@@ -67,7 +65,6 @@ const historySlice = createSlice({
         state.error = action.payload;
       })
       .addCase(togglePin.fulfilled, (state, action) => {
-        // עדכון ה-isPinned ברשימה
         const updated = action.payload;
         state.all = state.all.map((item) =>
           item.gameId === updated.gameId

@@ -1,63 +1,120 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
-import Hls from 'hls.js';
+import { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { RTCView } from 'react-native-webrtc';
+import { mediaSocket, emitMediaPromise } from '../services/socket.service';
+import { MediasoupManager } from '../services/MediasoupManager';
+import { SOCKET_EVENTS } from '@worldplay/shared';
 
 export default function ViewerTestScreen() {
-  const videoRef = useRef(null);
-  const gameStream = useSelector((state) => state.gameStream) || {};
-  const { hlsUrl = null, status = 'IDLE' } = gameStream;
-  const isPaused = status === 'PAUSE';
+  const [streamId, setStreamId] = useState('');
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [status, setStatus] = useState('Enter a Stream ID to watch');
 
-  useEffect(() => {
-    if (hlsUrl && videoRef.current) {
-      if (Hls.isSupported()) {
-        const hls = new Hls({ lowLatencyMode: true });
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(videoRef.current);
+  const startWatching = async () => {
+    try {
+      setStatus('Joining stream...');
 
-        // טיפול בשגיאות טעינה (למשל אם הקובץ עוד לא נוצר)
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) console.warn('HLS Error:', data.type);
-        });
+      const { rtpCapabilities, producerIds } = await emitMediaPromise(
+        SOCKET_EVENTS.STREAM.JOIN,
+        { streamId }
+      );
+
+      if (!producerIds || producerIds.length === 0) {
+        setStatus('Stream has not started yet or has no video');
+        return;
       }
-    }
-  }, [hlsUrl]);
 
-  useEffect(() => {
-    if (!videoRef.current) return;
-    if (isPaused) {
-      videoRef.current.pause();
-    } else if (status === 'ACTIVE') {
-      videoRef.current.play().catch(() => {});
+      setStatus('Loading WebRTC device...');
+      await MediasoupManager.initDevice(rtpCapabilities);
+
+      setStatus('Creating transport...');
+      const transport = await MediasoupManager.createTransport(
+        mediaSocket,
+        'recv',
+        streamId
+      );
+
+      const { MediaStream } = require('@livekit/react-native-webrtc');
+      const tracks = [];
+
+      for (const producerId of producerIds) {
+        setStatus('Receiving video...');
+        const consumerData = await emitMediaPromise(
+          SOCKET_EVENTS.STREAM.CONSUME,
+          {
+            streamId,
+            transportId: transport.id,
+            producerId,
+            rtpCapabilities: MediasoupManager.getRtpCapabilities(),
+          }
+        );
+
+        const consumer = await transport.consume({
+          id: consumerData.id,
+          producerId: consumerData.producerId,
+          kind: consumerData.kind,
+          rtpParameters: consumerData.rtpParameters,
+        });
+
+        tracks.push(consumer.track);
+      }
+
+      const stream = new MediaStream(tracks);
+      setRemoteStream(stream);
+      setStatus('Watching live stream');
+    } catch (err) {
+      setStatus('Error: ' + err.message);
     }
-  }, [isPaused, status]);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>בדיקת צופה (HLS Stream)</Text>
-      <View style={styles.infoBox}>
-        <Text style={{ color: isPaused ? 'red' : 'green' }}>
-          סטטוס: {status}
-        </Text>
-        <Text style={{ color: '#aaa', fontSize: 10 }}>URL: {hlsUrl}</Text>
-      </View>
+      <Text style={styles.status}>{status}</Text>
 
-      <View style={styles.videoBox}>
-        <video ref={videoRef} style={styles.video} autoPlay playsInline />
-      </View>
+      {!remoteStream ? (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Paste Stream ID here"
+            placeholderTextColor="#888"
+            value={streamId}
+            onChangeText={setStreamId}
+          />
+          <Button
+            title="Start watching"
+            onPress={startWatching}
+            color="#2ed573"
+          />
+        </>
+      ) : (
+        <View style={styles.videoBox}>
+          <RTCView
+            streamURL={remoteStream.toURL()}
+            style={styles.video}
+            objectFit="cover"
+          />
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1a1a1a', padding: 20 },
-  videoBox: { width: '100%', aspectRatio: 16 / 9, backgroundColor: '#000' },
-  video: { width: '100%', height: '100%' },
-  infoBox: {
+  container: { flex: 1, backgroundColor: '#000', padding: 20 },
+  status: {
+    color: '#fff',
+    textAlign: 'center',
     marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#333',
-    borderRadius: 5,
+    fontSize: 16,
   },
+  input: {
+    backgroundColor: '#222',
+    color: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    fontSize: 14,
+  },
+  videoBox: { width: '100%', aspectRatio: 16 / 9 },
+  video: { width: '100%', height: '100%' },
 });

@@ -18,7 +18,7 @@ import {
 } from '../store/slices/inboxSlice';
 import { socket } from '../services/socket.service';
 
-// ─── 1. קומפוננטים קטנים ───────────────────────────────────
+// Small shared components
 const Badge = ({ label, color = '#ffa502' }) => (
   <View
     style={[
@@ -72,7 +72,7 @@ Btn.propTypes = {
   loading: PropTypes.bool,
 };
 
-// ─── 2. הקומפוננט הראשי ───────────────────────────────────
+// Main screen component
 const InboxScreen = () => {
   const dispatch = useDispatch();
   const { items, loading, hasMore, page, error } = useSelector(
@@ -84,7 +84,6 @@ const InboxScreen = () => {
     dispatch(fetchInbox({ page: 1, limit: 10 }));
 
     const handleNewItem = (data) => {
-      console.log('🚀 [Socket Inbox]: New Item Received', data);
       dispatch(addNewItem(data));
     };
 
@@ -112,15 +111,15 @@ const InboxScreen = () => {
         <Badge
           label={
             item.type === 'GIFT'
-              ? '🎁 מתנה'
+              ? 'Gift'
               : item.type === 'FOLLOW'
-                ? '👤 עוקב'
-                : '📢 מערכת'
+                ? 'Follower'
+                : 'System'
           }
           color={item.type === 'GIFT' ? '#34d399' : '#60a5fa'}
         />
         <Text style={styles.timestamp}>
-          {new Date(item.timestamp).toLocaleTimeString('he-IL', {
+          {new Date(item.timestamp).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
           })}
@@ -132,13 +131,13 @@ const InboxScreen = () => {
 
       <View style={styles.actions}>
         <Btn
-          label="סמן כנקרא"
+          label="Mark as read"
           onPress={() => dispatch(markAsRead({ id: item.id, type: item.type }))}
           color="#374151"
         />
         {item.type === 'FOLLOW' && item.metadata && !item.metadata.isMutual && (
           <Btn
-            label="עקוב חזרה"
+            label="Follow back"
             onPress={() => console.log('Follow back logic here')}
             color="#ffa502"
           />
@@ -150,7 +149,7 @@ const InboxScreen = () => {
   return (
     <View style={styles.container}>
       {error && (
-        <Text style={styles.errorText}>שגיאה בטעינת ההודעות: {error}</Text>
+        <Text style={styles.errorText}>Failed to load messages: {error}</Text>
       )}
       <FlatList
         data={items}
@@ -172,7 +171,7 @@ const InboxScreen = () => {
         }
         ListEmptyComponent={() =>
           !loading && (
-            <Text style={styles.emptyText}>אין הודעות חדשות באינבוקס</Text>
+            <Text style={styles.emptyText}>No new messages in inbox</Text>
           )
         }
         contentContainerStyle={styles.listContent}
@@ -181,7 +180,7 @@ const InboxScreen = () => {
   );
 };
 
-// ─── 3. סטיילים ──────────────────────────────────────────
+// Styles
 const badgeStyles = StyleSheet.create({
   wrap: {
     borderWidth: 1,

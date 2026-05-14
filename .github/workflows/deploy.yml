@@ -1,0 +1,31 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        env:
+          SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+          HOST: ${{ secrets.DO_HOST }}
+          USER: ${{ secrets.DO_USER }}
+        run: |
+          echo "$SSH_KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          CLEAN_HOST=$(echo "$HOST" | tr -d '[:space:]')
+          CLEAN_USER=$(echo "$USER" | tr -d '[:space:]')
+          ssh -i /tmp/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o BatchMode=yes \
+            $CLEAN_USER@$CLEAN_HOST '
+              cd /root/World-Play-Backend &&
+              git pull origin main &&
+              docker compose up -d --build app-server media-server &&
+              (docker compose restart prisma-studio || true)
+            '
+          rm -f /tmp/deploy_key

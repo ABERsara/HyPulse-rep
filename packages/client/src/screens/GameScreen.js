@@ -152,7 +152,7 @@ const NoQuestion = () => (
     <Text
       style={{ color: '#9ca3af', textAlign: 'center', paddingVertical: 20 }}
     >
-      אין שאלה פעילה.{'\n'}צור שאלה קודם מהטאב ➕
+      No active question.{'\n'}Create one from the Question tab.
     </Text>
   </Card>
 );
@@ -166,9 +166,10 @@ const WinnerForm = ({ gameId, onCreated }) => {
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
-    if (!questionText.trim()) return Alert.alert('שגיאה', 'חסר טקסט שאלה');
+    if (!questionText.trim())
+      return Alert.alert('Error', 'Question text is required');
     if (!player1Name.trim() || !player2Name.trim())
-      return Alert.alert('שגיאה', 'חסרים שמות שחקנים');
+      return Alert.alert('Error', 'Player names are required');
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -199,14 +200,14 @@ const WinnerForm = ({ gameId, onCreated }) => {
       }
       if (res.ok) {
         const q = data.question || data;
-        Alert.alert('✅ שאלה נוצרה!', `ID: ${q.id || '—'}`);
+        Alert.alert('Question created!', `ID: ${q.id || '—'}`);
         onCreated(q);
       } else {
-        Alert.alert('שגיאה ' + res.status, data.error || data.message || text);
+        Alert.alert('Error ' + res.status, data.error || data.message || text);
       }
     } catch (e) {
       console.error('Create winner question error:', e);
-      Alert.alert('שגיאה', 'בעיית תקשורת');
+      Alert.alert('Error', 'Network error');
     } finally {
       setLoading(false);
     }
@@ -214,34 +215,34 @@ const WinnerForm = ({ gameId, onCreated }) => {
 
   return (
     <>
-      <Badge label="🏆 מי ינצח?" color="#60a5fa" />
+      <Badge label="Who wins?" color="#60a5fa" />
       <View style={{ height: 14 }} />
       <Field
-        label="טקסט השאלה"
+        label="Question text"
         value={questionText}
         onChangeText={setQuestionText}
-        placeholder="מי ינצח בסיבוב הזה?"
+        placeholder="Who will win this round?"
       />
       <Field
-        label="שחקן א׳ – שם"
+        label="Player A – Name"
         value={player1Name}
         onChangeText={setPlayer1Name}
-        placeholder="שם שחקן א'"
+        placeholder="Player A name"
       />
       <Field
-        label="שחקן א׳ – Player ID (אופציונלי)"
+        label="Player A – Player ID (optional)"
         value={player1Id}
         onChangeText={setPlayer1Id}
         placeholder="uuid..."
       />
       <Field
-        label="שחקן ב׳ – שם"
+        label="Player B – Name"
         value={player2Name}
         onChangeText={setPlayer2Name}
-        placeholder="שם שחקן ב'"
+        placeholder="Player B name"
       />
       <Btn
-        label="צור שאלה"
+        label="Create question"
         onPress={handleCreate}
         color="#60a5fa"
         loading={loading}
@@ -254,8 +255,8 @@ WinnerForm.propTypes = {
   onCreated: PropTypes.func.isRequired,
 };
 
-// ─── STANDARD form (אמריקאית) ─────────────────────────────────
-const OPTION_LABELS = ['א', 'ב', 'ג', 'ד'];
+// ─── STANDARD form (multiple choice) ─────────────────────────
+const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 const StandardForm = ({ gameId, onCreated }) => {
   const [questionText, setQuestionText] = useState('');
@@ -272,7 +273,6 @@ const StandardForm = ({ gameId, onCreated }) => {
   };
 
   const setCorrect = (index) => {
-    // רק אחת יכולה להיות נכונה
     setOptions(options.map((opt, i) => ({ ...opt, isCorrect: i === index })));
   };
 
@@ -284,18 +284,19 @@ const StandardForm = ({ gameId, onCreated }) => {
   const removeOption = (index) => {
     if (options.length <= 2) return;
     const updated = options.filter((_, i) => i !== index);
-    // אם הסרנו את הנכונה, נאפס
     const hasCorrect = updated.some((o) => o.isCorrect);
     if (!hasCorrect) updated[0] = { ...updated[0], isCorrect: true };
     setOptions(updated);
   };
 
   const handleCreate = async () => {
-    if (!questionText.trim()) return Alert.alert('שגיאה', 'חסר טקסט שאלה');
+    if (!questionText.trim())
+      return Alert.alert('Error', 'Question text is required');
     const filled = options.filter((o) => o.text.trim());
-    if (filled.length < 2) return Alert.alert('שגיאה', 'חובה לפחות 2 אפשרויות');
+    if (filled.length < 2)
+      return Alert.alert('Error', 'At least 2 options are required');
     if (!filled.some((o) => o.isCorrect))
-      return Alert.alert('שגיאה', 'סמן תשובה נכונה אחת');
+      return Alert.alert('Error', 'Mark one correct answer');
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -319,14 +320,14 @@ const StandardForm = ({ gameId, onCreated }) => {
       }
       if (res.ok) {
         const q = data.question || data;
-        Alert.alert('✅ שאלה נוצרה!', `ID: ${q.id || '—'}`);
+        Alert.alert('Question created!', `ID: ${q.id || '—'}`);
         onCreated(q);
       } else {
-        Alert.alert('שגיאה ' + res.status, data.error || data.message || text);
+        Alert.alert('Error ' + res.status, data.error || data.message || text);
       }
     } catch (e) {
       console.error('Create standard question error:', e);
-      Alert.alert('שגיאה', 'בעיית תקשורת');
+      Alert.alert('Error', 'Network error');
     } finally {
       setLoading(false);
     }
@@ -334,16 +335,16 @@ const StandardForm = ({ gameId, onCreated }) => {
 
   return (
     <>
-      <Badge label="📝 שאלה אמריקאית" color="#a78bfa" />
+      <Badge label="Multiple choice" color="#a78bfa" />
       <View style={{ height: 14 }} />
       <Field
-        label="טקסט השאלה"
+        label="Question text"
         value={questionText}
         onChangeText={setQuestionText}
-        placeholder="כתוב את השאלה כאן..."
+        placeholder="Write the question here..."
       />
       <Text style={stdStyles.optionsTitle}>
-        אפשרויות — לחץ על ✓ לסימון התשובה הנכונה
+        Options — tap to mark the correct answer
       </Text>
       {options.map((opt, i) => (
         <View key={i} style={stdStyles.optBlock}>
@@ -358,7 +359,7 @@ const StandardForm = ({ gameId, onCreated }) => {
               ]}
               value={opt.text}
               onChangeText={(v) => updateText(i, v)}
-              placeholder={`אפשרות ${OPTION_LABELS[i]}...`}
+              placeholder={`Option ${OPTION_LABELS[i]}...`}
               placeholderTextColor="#4b5563"
               autoCapitalize="none"
             />
@@ -377,7 +378,7 @@ const StandardForm = ({ gameId, onCreated }) => {
                   opt.isCorrect && stdStyles.correctBtnTextActive,
                 ]}
               >
-                {opt.isCorrect ? '✓ תשובה נכונה' : '◯ סמן כנכונה'}
+                {opt.isCorrect ? '✓ Correct' : '◯ Mark as correct'}
               </Text>
             </TouchableOpacity>
             {options.length > 2 && (
@@ -385,7 +386,7 @@ const StandardForm = ({ gameId, onCreated }) => {
                 style={stdStyles.removeBtn}
                 onPress={() => removeOption(i)}
               >
-                <Text style={stdStyles.removeBtnText}>✕ הסר</Text>
+                <Text style={stdStyles.removeBtnText}>✕ Remove</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -394,12 +395,12 @@ const StandardForm = ({ gameId, onCreated }) => {
       {options.length < 4 && (
         <TouchableOpacity style={stdStyles.addBtn} onPress={addOption}>
           <Text style={stdStyles.addBtnText}>
-            ＋ הוסף אפשרות ({options.length}/4)
+            + Add option ({options.length}/4)
           </Text>
         </TouchableOpacity>
       )}
       <Btn
-        label="צור שאלה"
+        label="Create question"
         onPress={handleCreate}
         color="#a78bfa"
         loading={loading}
@@ -498,7 +499,7 @@ const LoadForm = ({ gameId, onCreated }) => {
   const [selectedQ, setSelectedQ] = useState(null);
 
   const fetchOpenQuestions = async () => {
-    if (!gameId) return Alert.alert('שגיאה', 'הכנס Game ID קודם');
+    if (!gameId) return Alert.alert('Error', 'Enter a Game ID first');
     setLoadingList(true);
     setOpenQuestions([]);
     setSelectedQ(null);
@@ -509,18 +510,18 @@ const LoadForm = ({ gameId, onCreated }) => {
       });
       const text = await res.text();
       if (text.startsWith('<')) {
-        Alert.alert('שגיאה', 'תגובה לא תקינה מהשרת');
+        Alert.alert('Error', 'Invalid server response');
         return;
       }
       const data = JSON.parse(text);
       const questions = Array.isArray(data) ? data : data.questions || [];
       const open = questions.filter((q) => !q.isResolved);
       if (open.length === 0)
-        Alert.alert('אין שאלות', 'לא נמצאו שאלות פתוחות במשחק זה');
+        Alert.alert('No questions', 'No open questions found for this game');
       setOpenQuestions(open);
     } catch (e) {
       console.error('Fetch open questions error:', e);
-      Alert.alert('שגיאה', 'בעיית תקשורת');
+      Alert.alert('Error', 'Network error');
     } finally {
       setLoadingList(false);
     }
@@ -533,12 +534,12 @@ const LoadForm = ({ gameId, onCreated }) => {
   const handleSelect = (q) => {
     setSelectedQ(q);
     onCreated(q);
-    Alert.alert('✅ שאלה נטענה', q.questionText || q.text || q.id);
+    Alert.alert('Question loaded', q.questionText || q.text || q.id);
   };
 
   return (
     <>
-      <Badge label="📋 שאלות פתוחות" color="#fbbf24" />
+      <Badge label="Open questions" color="#fbbf24" />
       <View style={{ height: 12 }} />
       {loadingList && (
         <ActivityIndicator color="#fbbf24" style={{ marginVertical: 20 }} />
@@ -547,7 +548,7 @@ const LoadForm = ({ gameId, onCreated }) => {
         <Text
           style={{ color: '#6b7280', textAlign: 'center', paddingVertical: 16 }}
         >
-          אין שאלות פתוחות
+          No open questions
         </Text>
       )}
       {openQuestions.map((q) => (
@@ -592,11 +593,7 @@ const LoadForm = ({ gameId, onCreated }) => {
         </TouchableOpacity>
       ))}
       {!loadingList && (
-        <Btn
-          label="🔄 רענן רשימה"
-          onPress={fetchOpenQuestions}
-          color="#374151"
-        />
+        <Btn label="Refresh" onPress={fetchOpenQuestions} color="#374151" />
       )}
     </>
   );
@@ -641,9 +638,9 @@ const loadStyles = StyleSheet.create({
 
 // ─── CreateQuestionSection (wrapper) ─────────────────────────
 const MODES = [
-  { id: 'winner', label: '🏆 מי ינצח' },
-  { id: 'standard', label: '📝 שאלה' },
-  { id: 'load', label: '📋 טען' },
+  { id: 'winner', label: 'Who wins' },
+  { id: 'standard', label: 'Multiple choice' },
+  { id: 'load', label: 'Load' },
 ];
 
 const CreateQuestionSection = ({ gameId, onCreated }) => {
@@ -700,8 +697,8 @@ const modeStyles = StyleSheet.create({
 });
 
 // ─── ResolveQuestionSection ───────────────────────────────────
-// WINNER_TAKES_ALL → בוחרים מי ניצח
-// STANDARD         → כפתור אחד "סגור שאלה" (התשובה הנכונה ידועה מהיצירה)
+// WINNER_TAKES_ALL → select the winner
+// STANDARD         → one button to close (correct answer is known from creation)
 const ResolveQuestionSection = ({ question }) => {
   const [loading, setLoading] = useState(false);
   if (!question) return null;
@@ -720,10 +717,11 @@ const ResolveQuestionSection = ({ question }) => {
         body: JSON.stringify({ optionId }),
       });
       const data = await res.json();
-      if (res.ok) Alert.alert('✅ שאלה נסגרה!', 'הקופה חולקה והיתרות עודכנו');
-      else Alert.alert('שגיאה', data.error || 'אין הרשאה');
+      if (res.ok)
+        Alert.alert('Question closed!', 'Pot distributed and balances updated');
+      else Alert.alert('Error', data.error || 'Unauthorized');
     } catch {
-      Alert.alert('שגיאה', 'תקלה בחיבור לשרת');
+      Alert.alert('Error', 'Server connection failed');
     } finally {
       setLoading(false);
     }
@@ -731,15 +729,14 @@ const ResolveQuestionSection = ({ question }) => {
 
   return (
     <Card>
-      <Badge label="⚡ סגירת שאלה" color="#f87171" />
+      <Badge label="Close question" color="#f87171" />
       <Text style={resolve.questionText}>
         {question.questionText || question.text}
       </Text>
 
       {isWinner ? (
-        // WINNER_TAKES_ALL — בחירת מי ניצח
         <>
-          <Text style={resolve.subTitle}>בחר את הזוכה:</Text>
+          <Text style={resolve.subTitle}>Select the winner:</Text>
           {options.map((opt) => (
             <TouchableOpacity
               key={opt.id}
@@ -756,16 +753,15 @@ const ResolveQuestionSection = ({ question }) => {
           ))}
         </>
       ) : (
-        // STANDARD — סגירה עם התשובה הנכונה שכבר ידועה
         <>
           {correctOpt && (
             <View style={resolve.correctBox}>
-              <Text style={resolve.correctLabel}>✓ תשובה נכונה:</Text>
+              <Text style={resolve.correctLabel}>✓ Correct answer:</Text>
               <Text style={resolve.correctText}>{correctOpt.text}</Text>
             </View>
           )}
           <Btn
-            label="סגור שאלה וחלק פרסים"
+            label="Close question & distribute rewards"
             onPress={() => correctOpt && handleResolve(correctOpt.id)}
             color="#f87171"
             loading={loading}
@@ -846,7 +842,7 @@ const BettingSection = ({ question }) => {
 
   const handleBet = async (optionId, optionLabel) => {
     if (!wager || Number(wager) <= 0)
-      return Alert.alert('שגיאה', 'סכום הימור לא תקין');
+      return Alert.alert('Error', 'Invalid wager amount');
     setLoadingOption(optionId);
     try {
       const headers = await getAuthHeaders();
@@ -861,10 +857,10 @@ const BettingSection = ({ question }) => {
       });
       const data = await res.json();
       if (res.ok)
-        Alert.alert('✅ הימור נשלח!', `הימרת ${wager} על: ${optionLabel}`);
-      else Alert.alert('שגיאה', data.error || 'ההימור נכשל');
+        Alert.alert('Bet placed!', `You wagered ${wager} on: ${optionLabel}`);
+      else Alert.alert('Error', data.error || 'Bet failed');
     } catch {
-      Alert.alert('שגיאה', 'בעיית תקשורת');
+      Alert.alert('Error', 'Network error');
     } finally {
       setLoadingOption(null);
     }
@@ -872,12 +868,12 @@ const BettingSection = ({ question }) => {
 
   return (
     <Card>
-      <Badge label="🎲 הימורים" color="#a78bfa" />
+      <Badge label="Bets" color="#a78bfa" />
       <Text style={bet.questionText}>
         {question.questionText || question.text}
       </Text>
       <Field
-        label="סכום הימור"
+        label="Wager amount"
         value={wager}
         onChangeText={setWager}
         placeholder="10"
@@ -959,7 +955,7 @@ const SendGiftSection = ({ gameId }) => {
       !giftValue ||
       !giftGameId
     )
-      return Alert.alert('שגיאה', 'יש למלא את כל השדות');
+      return Alert.alert('Error', 'All fields are required');
     setLoading(true);
     setLastResponse(null);
     try {
@@ -985,11 +981,11 @@ const SendGiftSection = ({ gameId }) => {
       }
       setLastResponse({ ok: res.ok, status: res.status, data });
       if (res.ok)
-        Alert.alert('🎁 מתנה נשלחה!', `${giftValue} מטבעות נשלחו בהצלחה`);
+        Alert.alert('Gift sent!', `${giftValue} coins sent successfully`);
       else
-        Alert.alert('שגיאה ' + res.status, data.error || data.message || text);
+        Alert.alert('Error ' + res.status, data.error || data.message || text);
     } catch (e) {
-      Alert.alert('שגיאה', 'בעיית תקשורת: ' + e.message);
+      Alert.alert('Error', 'Network error: ' + e.message);
     } finally {
       setLoading(false);
     }
@@ -997,7 +993,7 @@ const SendGiftSection = ({ gameId }) => {
 
   return (
     <Card>
-      <Badge label="🎁 שליחת מתנה" color="#34d399" />
+      <Badge label="Send gift" color="#34d399" />
       <View style={{ height: 14 }} />
       <Field
         label="Sender ID"
@@ -1024,14 +1020,14 @@ const SendGiftSection = ({ gameId }) => {
         placeholder="uuid..."
       />
       <Field
-        label="ערך המתנה"
+        label="Gift amount"
         value={giftValue}
         onChangeText={setGiftValue}
         placeholder="100"
         keyboardType="numeric"
       />
       <Btn
-        label="שלח מתנה"
+        label="Send gift"
         onPress={handleSend}
         color="#34d399"
         loading={loading}
@@ -1052,7 +1048,7 @@ const SendGiftSection = ({ gameId }) => {
               fontWeight: '700',
             }}
           >
-            {lastResponse.ok ? '✅ הצלחה' : '❌ שגיאה'} — Status:{' '}
+            {lastResponse.ok ? 'Success' : 'Error'} — Status:{' '}
             {lastResponse.status}
           </Text>
           <Text style={{ color: '#9ca3af', fontSize: 11, marginTop: 4 }}>
@@ -1090,7 +1086,6 @@ const GameScreen = ({ gameId: gameIdProp }) => {
       const questions = Array.isArray(data) ? data : data.questions || [];
       const open = questions.find((q) => !q.isResolved);
       if (open) {
-        console.log('✅ Open question:', open.id);
         setActiveQuestion(open);
       }
     } catch (e) {
@@ -1120,7 +1115,6 @@ const GameScreen = ({ gameId: gameIdProp }) => {
     };
     fetchStats();
     const onUpdate = (data) => {
-      console.log('🚀 [Socket]:', data);
       dispatch(updateBalances(data));
     };
     socket.on('balance_update', onUpdate);
@@ -1128,25 +1122,25 @@ const GameScreen = ({ gameId: gameIdProp }) => {
   }, [resolvedGameId, dispatch]);
 
   const tabs = [
-    { id: 'question', label: '➕ שאלה' },
-    { id: 'bet', label: '🎲 הימור' },
-    ...(isModerator ? [{ id: 'resolve', label: '⚡ סגירה' }] : []),
-    { id: 'gift', label: '🎁 מתנה' },
+    { id: 'question', label: 'Question' },
+    { id: 'bet', label: 'Bet' },
+    ...(isModerator ? [{ id: 'resolve', label: 'Resolve' }] : []),
+    { id: 'gift', label: 'Gift' },
   ];
 
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>פאנל ניהול</Text>
+        <Text style={styles.headerTitle}>Control Panel</Text>
         <View style={styles.statsRow}>
           <View style={styles.statChip}>
-            <Text style={styles.statChipLabel}>ארנק</Text>
+            <Text style={styles.statChipLabel}>Wallet</Text>
             <Text style={[styles.statChipVal, { color: '#ffa502' }]}>
               {Number(walletBalance).toFixed(0)}
             </Text>
           </View>
           <View style={styles.statChip}>
-            <Text style={styles.statChipLabel}>ניקוד</Text>
+            <Text style={styles.statChipLabel}>Score</Text>
             <Text style={[styles.statChipVal, { color: '#34d399' }]}>
               {Number(score).toFixed(0)}
             </Text>
@@ -1160,7 +1154,7 @@ const GameScreen = ({ gameId: gameIdProp }) => {
           style={styles.gameIdInput}
           value={resolvedGameId}
           onChangeText={setResolvedGameId}
-          placeholder="הכנס Game ID..."
+          placeholder="Enter Game ID..."
           placeholderTextColor="#4b5563"
           autoCapitalize="none"
           onEndEditing={() => fetchOpenQuestion(resolvedGameId)}

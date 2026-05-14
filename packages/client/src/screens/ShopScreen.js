@@ -20,12 +20,12 @@ const ShopScreen = ({ userId, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [fetchingBalance, setFetchingBalance] = useState(true);
 
-  // סנכרון עם Redux - היתרה והניקוד נמשכים מכאן ומתעדכנים אוטומטית מהסוקט
+  // Redux sync — wallet and score are read here and auto-updated via socket middleware
   const coins = useSelector((state) => state.wallet.walletBalance || 0);
   const scores = useSelector((state) => state.wallet.scoresByGame || {});
 
   // ========================================
-  // פונקציה לשליפת נתונים ועדכון הסטור
+  // Fetch profile and sync balances into Redux
   // ========================================
   const fetchAndSyncBalance = async () => {
     try {
@@ -49,7 +49,6 @@ const ShopScreen = ({ userId, onLogout }) => {
       }
 
       const data = await response.json();
-      console.log('📥 Data fetched from server:', data);
 
       dispatch(
         updateBalances({
@@ -58,7 +57,7 @@ const ShopScreen = ({ userId, onLogout }) => {
         })
       );
     } catch (e) {
-      console.error('❌ Fetch balance error:', e);
+      console.error('Fetch balance error:', e);
     }
   };
 
@@ -72,9 +71,6 @@ const ShopScreen = ({ userId, onLogout }) => {
     initializeScreen();
   }, [userId]);
 
-  // ========================================
-  // לוגיקת רכישה (Stripe)
-  // ========================================
   const buyPackage = async (amount) => {
     setLoading(true);
     try {
@@ -108,22 +104,22 @@ const ShopScreen = ({ userId, onLogout }) => {
       const { error: paymentError } = await presentPaymentSheet();
 
       if (paymentError) {
-        console.log('❌ Payment cancelled:', paymentError.message);
+        // user cancelled or payment failed — no action needed
       } else {
-        Alert.alert('בהצלחה!', 'התשלום בוצע. היתרה תתעדכן תוך שניות...');
+        Alert.alert(
+          'Success!',
+          'Payment complete. Balance will update in a few seconds...'
+        );
         setTimeout(fetchAndSyncBalance, 3000);
       }
     } catch (error) {
-      console.error('❌ Payment error:', error);
-      Alert.alert('שגיאה', error.message);
+      console.error('Payment error:', error);
+      Alert.alert('Error', error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========================================
-  // בדיקת סנכרון הימור (המרה מיידית)
-  // ========================================
   const triggerTestAnswer = async () => {
     try {
       const token = await authService.getToken();
@@ -144,15 +140,13 @@ const ShopScreen = ({ userId, onLogout }) => {
       );
 
       const data = await response.json();
-      console.log('✅ Server processed answer:', data);
 
       if (data.answer) {
-        // היתרה תתעדכן אוטומטית דרך ה-Socket Middleware,
-        // הקריאה ל-fetchAndSyncBalance היא רק לגיבוי
+        // Balance is auto-updated via socket middleware; fetchAndSyncBalance is a fallback
         fetchAndSyncBalance();
       }
     } catch (err) {
-      Alert.alert('שגיאה בבדיקה', err.message);
+      Alert.alert('Test error', err.message);
     }
   };
 
@@ -160,7 +154,7 @@ const ShopScreen = ({ userId, onLogout }) => {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#ffa502" />
-        <Text style={styles.loadingText}>טוען נתונים...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -168,43 +162,40 @@ const ShopScreen = ({ userId, onLogout }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.logoutBtn} onPress={onLogout}>
-        <Text style={styles.logoutText}>🚪 יציאה</Text>
+        <Text style={styles.logoutText}>Sign Out</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>🪙 חנות מטבעות</Text>
+      <Text style={styles.title}>Coin Store</Text>
 
       <View style={styles.statsContainer}>
-        {/* תיקון: הצגת היתרה עם דיוק של 2 ספרות אחרי הנקודה */}
         <Text style={styles.balance}>
-          יתרה: {Number(coins || 0).toFixed(2)} מטבעות
+          Balance: {Number(coins || 0).toFixed(2)} coins
         </Text>
         <Text style={styles.scoreText}>
-          ניקוד פעיל: {Number(Object.values(scores)[0] || 0).toFixed(2)} נקודות
+          Active score: {Number(Object.values(scores)[0] || 0).toFixed(2)} pts
         </Text>
       </View>
 
       <TouchableOpacity style={styles.testButton} onPress={triggerTestAnswer}>
-        <Text style={styles.testButtonText}>
-          🎯 בדיקת סנכרון (הימור 10 מטבעות)
-        </Text>
+        <Text style={styles.testButtonText}>Test sync (bet 10 coins)</Text>
       </TouchableOpacity>
 
       <View style={styles.packageContainer}>
         <PackageCard
-          title="10 מטבעות"
+          title="10 Coins"
           price="₪10"
           onPress={() => buyPackage(10)}
           disabled={loading}
         />
         <PackageCard
-          title="50 מטבעות"
+          title="50 Coins"
           price="₪50"
           popular
           onPress={() => buyPackage(50)}
           disabled={loading}
         />
         <PackageCard
-          title="100 מטבעות"
+          title="100 Coins"
           price="₪100"
           onPress={() => buyPackage(100)}
           disabled={loading}
@@ -214,7 +205,7 @@ const ShopScreen = ({ userId, onLogout }) => {
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#ff4757" />
-          <Text style={styles.loadingText}>מעבד תשלום...</Text>
+          <Text style={styles.loadingText}>Processing payment...</Text>
         </View>
       )}
     </View>
@@ -229,13 +220,13 @@ const PackageCard = ({ title, price, onPress, disabled, popular }) => (
   >
     {popular && (
       <View style={styles.badge}>
-        <Text style={styles.badgeText}>הכי פופולרי!</Text>
+        <Text style={styles.badgeText}>Most popular!</Text>
       </View>
     )}
     <Text style={styles.packageTitle}>{title}</Text>
     <Text style={styles.packagePrice}>{price}</Text>
     {popular && (
-      <Text style={styles.bonusText}>(בונוס פי 2 לקנייה ראשונה!)</Text>
+      <Text style={styles.bonusText}>(First purchase bonus x2!)</Text>
     )}
   </TouchableOpacity>
 );

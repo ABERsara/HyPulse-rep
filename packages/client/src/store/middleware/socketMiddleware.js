@@ -1,5 +1,6 @@
 import { updateBalances } from '../slices/walletSlice';
 import * as socketService from '../../services/socket.service';
+import { SOCKET_EVENTS } from '@hypulse/shared';
 
 export const socketMiddleware = () => (store) => {
   const setupListener = () => {
@@ -7,9 +8,9 @@ export const socketMiddleware = () => (store) => {
 
     if (currentSocket) {
       // Remove previous listener to avoid duplicates
-      currentSocket.off('balance_update');
+      currentSocket.off(SOCKET_EVENTS.WALLET.BALANCE_UPDATE);
 
-      currentSocket.on('balance_update', (data) => {
+      currentSocket.on(SOCKET_EVENTS.WALLET.BALANCE_UPDATE, (data) => {
         store.dispatch(updateBalances(data));
       });
     } else {

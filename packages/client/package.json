@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "sync-env": "node -e \"const fs=require('fs'),path=require('path');const src=path.resolve(__dirname,'../../.env');if(fs.existsSync(src)){fs.copyFileSync(src,path.resolve(__dirname,'.env'));console.log('✓ .env synced from root');}\"",
+    "sync-env": "node -e \"const fs=require('fs'),path=require('path');const root=path.resolve(__dirname,'../..'),dev=path.join(root,'.env.development'),prod=path.join(root,'.env'),dest=path.resolve(__dirname,'.env');if(fs.existsSync(dev)){fs.copyFileSync(dev,dest);console.log('✓ .env synced from .env.development');}else if(fs.existsSync(prod)){fs.copyFileSync(prod,dest);console.log('✓ .env synced from .env');}\"",
     "start": "npm run sync-env && expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "npm run sync-env && expo run:android",

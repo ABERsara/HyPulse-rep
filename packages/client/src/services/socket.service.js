@@ -25,6 +25,7 @@ const getMediaServerUrl = () => {
 };
 
 export const getAppSocket = () => appSocketInstance;
+export const getMediaSocket = () => mediaSocketInstance;
 
 export const connectAppSocket = async () => {
   if (appSocketInstance && appSocketInstance.connected)

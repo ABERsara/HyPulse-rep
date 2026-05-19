@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { RTCView, mediaDevices } from 'react-native-webrtc';
 import {
-  socket,
+  getAppSocket,
   emitPromise,
   emitMediaPromise,
 } from '../services/socket.service';
@@ -66,7 +66,7 @@ export default function HostTestScreen() {
 
       setLocalStatus('Creating transport...');
       const transport = await MediasoupManager.createTransport(
-        socket,
+        getAppSocket(),
         'send',
         streamId
       );

@@ -5,6 +5,9 @@ packages/*/node_modules/
 # Security & Environment
 .env
 .env.*
+!.env.example
+firebase-service-account.json
+**/firebase-service-account.json
 prompt.txt
 
 # Databases
@@ -42,6 +45,7 @@ TIP.txt
 
 # Database backups
 *.sql
+*.dump
 backup*.sql
 
 # Postman

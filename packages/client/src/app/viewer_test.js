@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
-import { mediaSocket, emitMediaPromise } from '../services/socket.service';
+import { getMediaSocket, connectMediaSocket, emitMediaPromise } from '../services/socket.service';
 import { MediasoupManager } from '../services/MediasoupManager';
 import { SOCKET_EVENTS } from '@worldplay/shared';
 
@@ -28,8 +28,9 @@ export default function ViewerTestScreen() {
       await MediasoupManager.initDevice(rtpCapabilities);
 
       setStatus('Creating transport...');
+      await connectMediaSocket();
       const transport = await MediasoupManager.createTransport(
-        mediaSocket,
+        getMediaSocket(),
         'recv',
         streamId
       );

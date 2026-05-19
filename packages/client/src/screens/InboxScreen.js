@@ -16,7 +16,7 @@ import {
   resetInbox,
   addNewItem,
 } from '../store/slices/inboxSlice';
-import { socket } from '../services/socket.service';
+import { getAppSocket } from '../services/socket.service';
 
 // Small shared components
 const Badge = ({ label, color = '#ffa502' }) => (
@@ -87,10 +87,12 @@ const InboxScreen = () => {
       dispatch(addNewItem(data));
     };
 
-    socket.on('new_inbox_item', handleNewItem);
+    const s = getAppSocket();
+    if (s) s.on('new_inbox_item', handleNewItem);
 
     return () => {
-      socket.off('new_inbox_item', handleNewItem);
+      const s2 = getAppSocket();
+      if (s2) s2.off('new_inbox_item', handleNewItem);
     };
   }, [dispatch]);
 

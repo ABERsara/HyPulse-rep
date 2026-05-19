@@ -24,6 +24,8 @@ const getMediaServerUrl = () => {
   return process.env.EXPO_PUBLIC_MEDIA_SERVER_URL;
 };
 
+export const getAppSocket = () => appSocketInstance;
+
 export const connectAppSocket = async () => {
   if (appSocketInstance && appSocketInstance.connected)
     return appSocketInstance;

@@ -7,7 +7,7 @@ import {
   Button,
   TextInput,
 } from 'react-native';
-import { socket, connectSocket, emitPromise } from '../services/socket.service';
+import { connectAppSocket, emitPromise } from '../services/socket.service';
 import { MediasoupManager } from '../services/MediasoupManager';
 
 export default function ViewerScreen() {
@@ -17,22 +17,24 @@ export default function ViewerScreen() {
   const [streamIdInput, setStreamIdInput] = useState('');
   const videoRef = useRef(null);
 
-  // Listen for socket events once on mount
   useEffect(() => {
-    const activeSocket = socket || connectSocket();
-
-    activeSocket.on('stream:new_producer', ({ producerId }) => {
-      consume(producerId, streamIdInput);
+    let activeSocket;
+    connectAppSocket().then((s) => {
+      if (!s) return;
+      activeSocket = s;
+      activeSocket.on('stream:new_producer', ({ producerId }) => {
+        consume(producerId, streamIdInput);
+      });
+      activeSocket.on('stream:closed', () => {
+        setRemoteStream(null);
+        setStatus('Stream ended by host');
+      });
     });
-
-    activeSocket.on('stream:closed', () => {
-      setRemoteStream(null);
-      setStatus('Stream ended by host');
-    });
-
     return () => {
-      activeSocket.off('stream:new_producer');
-      activeSocket.off('stream:closed');
+      if (activeSocket) {
+        activeSocket.off('stream:new_producer');
+        activeSocket.off('stream:closed');
+      }
     };
   }, [streamIdInput]);
 
@@ -62,8 +64,9 @@ export default function ViewerScreen() {
   const consume = async (producerId, targetId) => {
     try {
       const caps = MediasoupManager.getRtpCapabilities();
+      const activeSocket = await connectAppSocket();
       const transport = await MediasoupManager.createTransport(
-        socket,
+        activeSocket,
         'recv',
         targetId
       );

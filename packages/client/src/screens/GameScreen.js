@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { socket } from '../services/socket.service';
+import { getAppSocket } from '../services/socket.service';
 import { updateBalances } from '../store/slices/walletSlice';
 import { authService } from '../services/auth.service';
 
@@ -1117,8 +1117,9 @@ const GameScreen = ({ gameId: gameIdProp }) => {
     const onUpdate = (data) => {
       dispatch(updateBalances(data));
     };
-    socket.on('balance_update', onUpdate);
-    return () => socket.off('balance_update', onUpdate);
+    const s = getAppSocket();
+    if (s) s.on('balance_update', onUpdate);
+    return () => { const s2 = getAppSocket(); if (s2) s2.off('balance_update', onUpdate); };
   }, [resolvedGameId, dispatch]);
 
   const tabs = [

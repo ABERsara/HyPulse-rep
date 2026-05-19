@@ -279,9 +279,16 @@ export const registerStreamHandlers = (io, socket) => {
       if (!streamRoom) return callback({ error: 'Stream is not live yet' });
       socket.join(streamId);
       const producerIds = Object.keys(streamRoom.producers || {});
+
+      const game = await prisma.game.findFirst({
+        where: { streamId },
+        select: { id: true },
+      });
+
       callback({
         rtpCapabilities: streamRoom.router.rtpCapabilities,
         producerIds,
+        gameId: game?.id || null,
       });
     } catch (error) {
       callback({ error: error.message });

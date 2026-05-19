@@ -23,13 +23,27 @@ import * as gameRules from '../services/validation.service.js';
 const prisma = new PrismaClient();
 
 async function cancelOldGames(userId) {
-  return await prisma.game.updateMany({
-    where: {
-      hostId: userId,
-      status: { in: ['WAITING', 'ACTIVE'] },
-    },
+  const oldGames = await prisma.game.findMany({
+    where: { hostId: userId, status: { in: ['WAITING', 'ACTIVE'] } },
+    select: { id: true, streamId: true },
+  });
+
+  if (oldGames.length === 0) return;
+
+  const gameIds = oldGames.map((g) => g.id);
+  const streamIds = oldGames.map((g) => g.streamId).filter(Boolean);
+
+  await prisma.game.updateMany({
+    where: { id: { in: gameIds } },
     data: { status: 'FINISHED' },
   });
+
+  if (streamIds.length > 0) {
+    await prisma.stream.updateMany({
+      where: { id: { in: streamIds } },
+      data: { status: 'FINISHED' },
+    });
+  }
 }
 
 const gameService = {
@@ -121,10 +135,19 @@ const gameService = {
       dataToUpdate.finishedAt = now;
     }
 
-    return await prisma.game.update({
+    const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: dataToUpdate,
     });
+
+    if (newStatus === 'FINISHED' && game.streamId) {
+      await prisma.stream.update({
+        where: { id: game.streamId },
+        data: { status: 'FINISHED', endTime: new Date() },
+      });
+    }
+
+    return updatedGame;
   },
 
   async getFollowedFeed(userId) {

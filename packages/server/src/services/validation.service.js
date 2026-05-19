@@ -138,6 +138,22 @@ export const validateJoinEligibility = async (
     throw new Error('Unauthorized: You are not the host of this game');
   }
 
+  if (requestedRole === 'PLAYER') {
+    const activeParticipation = await prisma.gameParticipant.findFirst({
+      where: {
+        userId,
+        role: 'PLAYER',
+        game: { status: { in: ['WAITING', 'ACTIVE'] } },
+      },
+      include: { game: { select: { title: true } } },
+    });
+    if (activeParticipation) {
+      throw new Error(
+        `You are already playing in "${activeParticipation.game.title}". Finish that game before joining another.`
+      );
+    }
+  }
+
   const existingParticipant = await prisma.gameParticipant.findUnique({
     where: { gameId_userId: { gameId, userId } },
   });

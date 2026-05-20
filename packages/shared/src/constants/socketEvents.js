@@ -6,6 +6,10 @@ export const SOCKET_EVENTS = {
     DISCONNECT: 'disconnect',
     ERROR: 'error',
   },
+  // Wallet events (App-Server)
+  WALLET: {
+    BALANCE_UPDATE: 'wallet:balance_update',
+  },
   // Game events (App-Server)
   GAME: {
     CREATE: 'game:create',

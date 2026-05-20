@@ -18,13 +18,14 @@ model User {
   isVerified       Boolean           @default(false)
   lastActiveAt     DateTime?         @map("last_active_at")
   phoneNumber      String?           @unique
-  firebaseId       String?           @map("firebase_id")
 
+  firebaseId       String?           @map("firebase_id")
   googleId         String?           @unique @map("google_id")
   appleId          String?           @unique @map("apple_id")
-  dateOfBirth      DateTime?         @map("date_of_birth")
   facebookId       String?           @unique @map("facebook_id")
   
+  dateOfBirth      DateTime?         @map("date_of_birth")
+
   walletBalance    Decimal           @default(1000.00) @db.Decimal(10, 2)
   isFirstPurchase  Boolean           @default(true)
   stripeCustomerId String?           @unique @map("stripe_customer_id")

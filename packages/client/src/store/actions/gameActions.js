@@ -23,5 +23,6 @@ export const createAndStartGame = (gameData) => async (dispatch) => {
     return { gameId: id, streamId };
   } catch (error) {
     console.error('Failed to create game:', error);
+    throw error;
   }
 };

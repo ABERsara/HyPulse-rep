@@ -4,7 +4,7 @@ import { SOCKET_EVENTS } from '@hypulse/shared';
 
 export const socketMiddleware = () => (store) => {
   const setupListener = () => {
-    const currentSocket = socketService.socket;
+    const currentSocket = socketService.getAppSocket();
 
     if (currentSocket) {
       // Remove previous listener to avoid duplicates

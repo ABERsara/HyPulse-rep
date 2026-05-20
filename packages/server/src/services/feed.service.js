@@ -69,6 +69,17 @@ const feedService = {
 
     return liveStreams;
   },
+
+  async getPopularFeed({ page = 1, limit = 10 }) {
+    const skip = (page - 1) * limit;
+    return prisma.stream.findMany({
+      where: { status: 'LIVE' },
+      skip,
+      take: limit,
+      include: { host: true, games: true },
+      orderBy: { startTime: 'desc' },
+    });
+  },
 };
 
 export default feedService;

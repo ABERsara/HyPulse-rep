@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
-import { mediaSocket, emitMediaPromise } from '../services/socket.service';
+import { getMediaSocket, connectMediaSocket, emitMediaPromise, connectAppSocket, emitPromise } from '../services/socket.service';
 import { MediasoupManager } from '../services/MediasoupManager';
 import { SOCKET_EVENTS } from '@worldplay/shared';
 
@@ -14,7 +14,7 @@ export default function ViewerTestScreen() {
     try {
       setStatus('Joining stream...');
 
-      const { rtpCapabilities, producerIds } = await emitMediaPromise(
+      const { rtpCapabilities, producerIds, gameId } = await emitMediaPromise(
         SOCKET_EVENTS.STREAM.JOIN,
         { streamId }
       );
@@ -24,12 +24,23 @@ export default function ViewerTestScreen() {
         return;
       }
 
+      // Register viewer in DB via app server
+      if (gameId) {
+        try {
+          await connectAppSocket();
+          await emitPromise(SOCKET_EVENTS.GAME.JOIN, { gameId, role: 'VIEWER' });
+        } catch (e) {
+          console.warn('Viewer DB registration failed:', e.message);
+        }
+      }
+
       setStatus('Loading WebRTC device...');
       await MediasoupManager.initDevice(rtpCapabilities);
 
       setStatus('Creating transport...');
+      await connectMediaSocket();
       const transport = await MediasoupManager.createTransport(
-        mediaSocket,
+        getMediaSocket(),
         'recv',
         streamId
       );

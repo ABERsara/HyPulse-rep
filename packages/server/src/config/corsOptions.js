@@ -1,26 +1,25 @@
-const devOrigins = [
-  'http://localhost:3000',
-  'http://localhost:8081',
-  'http://localhost:19006',
-];
+const allowedOrigins = {
+  development: [
+    'http://localhost:8081',
+    'http://localhost:19006',
+    'exp://localhost:8081',
+  ],
+  staging: ['https://staging-api.hypulse.app'],
+  production: ['https://api.hypulse.app'],
+};
 
-const prodOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : [];
-
-const whitelist = [...devOrigins, ...prodOrigins];
+const env = process.env.NODE_ENV || 'development';
+const origins = allowedOrigins[env] || allowedOrigins.development;
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // null origin = mobile app (React Native) or server-to-server call
-    if (!origin || whitelist.includes(origin)) {
+    if (!origin || origins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`CORS blocked: ${origin}`));
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200,
 };
 
 export default corsOptions;

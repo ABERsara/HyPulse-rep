@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import PropTypes from 'prop-types';
-import { socket } from '../services/socket.service';
+import { getAppSocket } from '../services/socket.service';
 
 // Mock components to satisfy linter
 const VideoView = ({ label }) => (
@@ -36,8 +36,9 @@ export default function PlayerScreen({ streamId }) {
       setRemoteStreams((prev) => [...prev, { id: producerId, stream, role }]);
     };
 
-    socket.on('stream:new_producer', handleNewProducer);
-    return () => socket.off('stream:new_producer', handleNewProducer);
+    const s = getAppSocket();
+    if (s) s.on('stream:new_producer', handleNewProducer);
+    return () => { const s2 = getAppSocket(); if (s2) s2.off('stream:new_producer', handleNewProducer); };
   }, []);
 
   return (

@@ -13,6 +13,7 @@ import LoginScreen from '../screens/LoginScreen';
 import ShopScreen from '../screens/ShopScreen';
 import GameScreen from '../screens/GameScreen';
 import HostTestScreen from './host_test';
+import ViewerTestScreen from './viewer_test';
 import InboxScreen from '../screens/InboxScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 
@@ -64,6 +65,15 @@ export default function Page() {
     );
   }
 
+  if (currentScreen === 'VIEWER_TEST') {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+        {renderHeader('Viewer Test')}
+        <ViewerTestScreen />
+      </SafeAreaView>
+    );
+  }
+
   if (currentScreen === 'INBOX') {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#030712' }}>
@@ -110,6 +120,13 @@ export default function Page() {
           }}
         >
           <Text style={styles.btnText}>Host Test</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.menuBtn, { backgroundColor: '#2ed573' }]}
+          onPress={() => setCurrentScreen('VIEWER_TEST')}
+        >
+          <Text style={styles.btnText}>Viewer Test</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

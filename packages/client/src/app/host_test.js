@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { RTCView, mediaDevices } from 'react-native-webrtc';
 import {
-  socket,
+  getAppSocket,
   emitPromise,
   emitMediaPromise,
 } from '../services/socket.service';
@@ -66,7 +66,7 @@ export default function HostTestScreen() {
 
       setLocalStatus('Creating transport...');
       const transport = await MediasoupManager.createTransport(
-        socket,
+        getAppSocket(),
         'send',
         streamId
       );
@@ -96,7 +96,14 @@ export default function HostTestScreen() {
       setLocalStream(null);
     }
 
-    // Sending to server triggers the full DB + media cleanup chain
+    // Tell media server to close the room and update stream status in DB
+    try {
+      await emitMediaPromise(SOCKET_EVENTS.STREAM.ENDED, {});
+    } catch (e) {
+      // Non-fatal — game.service will also update the stream via STATUS_UPDATE
+    }
+
+    // Update game to FINISHED (also updates stream via game.service)
     await emitPromise(SOCKET_EVENTS.GAME.STATUS_UPDATE, {
       gameId: currentGameId,
       status: 'FINISHED',

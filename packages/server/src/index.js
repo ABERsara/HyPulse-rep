@@ -38,6 +38,7 @@ import { handleWebhook } from './payments/payments.webhook.js';
 
 import inboxRoutes from './routes/inbox.routes.js';
 import followRoutes from './routes/follow.routes.js';
+import feedRoutes from './routes/feed.routes.js';
 
 dotenv.config();
 const app = express();
@@ -72,6 +73,7 @@ app.use('/api/economy', economyRoutes);
 
 app.use('/api/inbox', inboxRoutes);
 app.use('/api/follows', followRoutes);
+app.use('/api/feed', feedRoutes);
 
 // --- Functions ---
 async function checkMediaServer() {

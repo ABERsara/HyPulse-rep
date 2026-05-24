@@ -41,7 +41,10 @@ https://<project-id>.firebaseapp.com/__/auth/handler
 ```json
 {
   "dependencies": {
-    "firebase": "^10.8.0",
+    "firebase": "^10.8.0"
+  },
+  "devDependencies": {
+    "firebase-admin": "^12.0.0",
     "jwt-decode": "^4.0.0"
   }
 }
@@ -49,11 +52,25 @@ https://<project-id>.firebaseapp.com/__/auth/handler
 
 **`firebase`** — Core Web SDK providing client-side authentication modules, managing OAuth handshakes, session persistence, and auth state.
 
-**`jwt-decode`** — Client/Server-side utility used to safely read token payloads without needing signature validation. Crucial for reading Apple/Facebook custom identity claims.
+**`firebase-admin`** *(devDependency — Server-side only)* — The Firebase Admin SDK, used exclusively in trusted server environments (Node.js / Express). It is never bundled into the client. Its primary role here is to verify incoming ID Tokens via `admin.auth().verifyIdToken(idToken)` — confirming the token's signature, expiry, and project audience — and to extract the decoded user payload for use in protected routes.
+
+**`jwt-decode`** *(optional — debugging only)* — Decodes a JWT payload on the client without verifying its signature. **Not required in production flows:** on the server, `verifyIdToken()` already returns the fully decoded payload; on the client, the token should only be forwarded to the server, never decoded locally. Keep only if you need to inspect token claims (e.g. `exp`, `auth_time`) during local development or debugging.
 
 ---
 
 ## Part 3: Provider Initialization & Constructor Signatures
+
+### 0. Auth Initialization (Required for All Providers)
+
+Before using any provider, you must initialize the Firebase app and obtain the `auth` instance. All SDK methods in Parts 3 and 4 depend on this object.
+
+```javascript
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
+const app = initializeApp(firebaseConfig); // firebaseConfig = your project's config object
+export const auth = getAuth(app);
+```
 
 ### 1. Google Provider
 
@@ -161,7 +178,7 @@ The `getIdToken(forceRefresh?: boolean)` method is exposed by the Firebase `User
 
 > **Token expiry: strictly 60 minutes.** Firebase auto-refreshes it on the next call after expiry.
 
-When decoded using `jwt-decode`, the token payload exposes the following security attributes:
+The token payload contains the following security claims (visible via `verifyIdToken()` on the server, or via `jwt-decode` for local debugging):
 
 | Claim | Description |
 |-------|-------------|
@@ -178,8 +195,6 @@ When decoded using `jwt-decode`, the token payload exposes the following securit
 **1. Client-Side Token Extraction Utility**
 
 ```javascript
-import { Auth } from "firebase/auth";
-
 export const getValidAuthToken = async (auth, forceRefresh = false) => {
   const currentUser = auth.currentUser;
   if (!currentUser) return null;

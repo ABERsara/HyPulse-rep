@@ -2,6 +2,7 @@
 // ✅ כלי עזר לסנכרון real-time של יתרות משתמשים
 
 import { PrismaClient } from '@prisma/client';
+import { SOCKET_EVENTS } from '@worldplay/shared';
 
 /**
  * שידור עדכון יתרה לכל המשתמשים המעורבים
@@ -42,7 +43,7 @@ export async function syncUserBalances(io, userIds) {
         };
 
         // שידור לחדר הפרטי של המשתמש
-        io.to(userId).emit('wallet:updated', balanceData);
+        io.to(userId).emit(SOCKET_EVENTS.WALLET.BALANCE_UPDATE, balanceData);
 
         console.log(
           `[SOCKET]  Updated balance for user ${userId}: ${balanceData.newBalance}`

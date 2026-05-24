@@ -187,6 +187,7 @@ npx prisma studio
 - `GET /api/finance/transactions` — Transaction history
 - `POST /api/payments/checkout-session` — Stripe checkout
 - `POST /api/payments/webhook` — Stripe webhook handler
+- `POST /api/payments/create-sheet` — Initialize Stripe Payment Sheet
 
 ### Configuration
 - `GET /api/config/media-server` — Media-server connection config

@@ -5,29 +5,64 @@ packages/*/node_modules/
 # Security & Environment
 .env
 .env.*
-prompt.txt
 
-# Databases
-packages/server/prisma/*.db
-packages/server/prisma/*.db-journal
+# Native certificates & keys
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+*.orig.*
 
-# Build & Logs
-.env.*
-prompt.txt
+# Expo
+.expo/
+expo-env.d.ts
+app-example
 
-# Databases
-packages/server/prisma/*.db
-packages/server/prisma/*.db-journal
+# Metro
+.metro-health-check*
 
-# Build & Logs
+# Build outputs
 dist/
+dist-android/
 build/
 web-build/
-.expo/
+
+# Backup files
+*.old
+
+# Logs
 *.log
-npm-debug.log*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Databases
+packages/server/prisma/*.db
+packages/server/prisma/*.db-journal
+
+# Database backups
+*.sql
+
+# Native folders (Expo prebuild)
+packages/client/android/
+packages/client/ios/
+
+# Gradle
+.gradle/
+**/android/.gradle
+**/android/build
+**/local.properties
+
+# Media server streams
 packages/media-server/public/streams/*
 !packages/media-server/public/streams/.gitkeep
+
+# Media files
+*.mp4
+media_files/
+packages/media-server/media_files/
 
 # System & IDE
 .vscode/
@@ -35,14 +70,10 @@ packages/media-server/public/streams/*
 .DS_Store
 Thumbs.db
 
-# Local scripts
+# Local scripts & temp files
 test.sh
 proxy.js
 TIP.txt
-
-# Database backups
-*.sql
-backup*.sql
 
 # Postman
 postman/
@@ -51,29 +82,5 @@ postman/
 # Claude Code (local settings)
 .claude/
 
-# Media files
-*.mp4
-packages/media-server/*.mp4
-video.mp4
-*video.mp4
-packages/media-server/video.mp4
-
-# Local scripts & Media
-test.sh
-media_files/
-packages/media-server/media_files/
-
-# Husky (Un-ignore just in case someone added a generic rule elsewhere)
+# Husky
 !.husky/
-
-# Expo Prebuild / Native folders
-packages/client/android/
-packages/client/ios/
-
-# Local properties (Android SDK path)
-**/local.properties
-
-# Gradle
-.gradle/
-**/android/.gradle
-**/android/build

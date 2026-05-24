@@ -286,3 +286,50 @@ docker system prune -a
 
 docker logs world-play-backend-media-server-1
 
+---
+
+## 📱 Android / Expo - פורט תפוס
+
+### בעיה: Metro Bundler נתקע על פורט 8081
+
+**תסמינים:** `Port 8081 is being used by another process` כשמריצים `npx expo run:android`
+
+```powershell
+# בדוק מי תופס את הפורט
+netstat -ano | findstr ":8081"
+
+# סגור את התהליך (קח את ה-PID מהפקודה למעלה)
+Stop-Process -Id <PID> -Force
+
+# או בפקודה אחת:
+netstat -ano | findstr ":8081" | ForEach-Object {
+  $parts = $_ -split '\s+'; $procId = $parts[-1]
+  if ($procId -match '^\d+$') { Stop-Process -Id ([int]$procId) -Force -Confirm:$false -ErrorAction SilentlyContinue }
+}
+```
+
+### הרצה נכונה של הקליינט
+
+```powershell
+# חשוב: תמיד להריץ מתוך packages/client ולא מה-root!
+cd packages/client
+npx expo run:android
+```
+
+**סיבה:** הפרויקט הוא monorepo — ה-app.json וה-android/ נמצאים ב-packages/client.
+הרצה מה-root יוצרת android/ שגוי ו-Metro לא מוצא את קובץ ה-App.
+
+---
+
+## 🔌 Socket Service - ייבואים נכונים
+
+קובץ `socket.service.js` מייצא:
+- `connectAppSocket()` — התחברות לשרת הראשי
+- `connectMediaSocket()` — התחברות לשרת המדיה
+- `getAppSocket()` — מחזיר את ה-instance הנוכחי (סינכרוני)
+- `getMediaSocket()` — מחזיר את ה-media instance הנוכחי
+- `emitPromise(event, data)` — שליחה לשרת הראשי עם Promise
+- `emitMediaPromise(event, data)` — שליחה לשרת המדיה עם Promise
+
+**לא קיים:** `socket`, `connectSocket`, `mediaSocket` — אל תייבא אותם!
+

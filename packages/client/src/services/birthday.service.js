@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+// import AsyncStorage from '@react-native-async-storage/async-storage'; // TODO (T42): uncomment when used in saveBirthday
 export const birthdayService = {
   hasDateOfBirth: (user) => {
     // TODO (T42): return !!user?.dateOfBirth

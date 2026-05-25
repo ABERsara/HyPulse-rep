@@ -1,6 +1,6 @@
 import { updateBalances } from '../slices/walletSlice';
 import * as socketService from '../../services/socket.service';
-import { SOCKET_EVENTS } from '@hypulse/shared';
+import { SOCKET_EVENTS } from '@worldplay/shared';
 
 export const socketMiddleware = () => (store) => {
   const setupListener = () => {

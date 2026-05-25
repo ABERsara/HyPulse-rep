@@ -5,6 +5,7 @@ packages/*/node_modules/
 # Security & Environment
 .env
 .env.*
+.env.development
 
 # Native certificates & keys
 *.jks
@@ -84,3 +85,6 @@ postman/
 
 # Husky
 !.husky/
+
+# Firebase service account (if used locally)
+firebase-service-account.json

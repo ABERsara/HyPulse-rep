@@ -1,4 +1,4 @@
-// ניהול פרופיל המשתמש — שליפת יתרה וניקוד, עדכון פרטים אישיים
+//     ניהול פרופיל המשתמש — שליפת יתרה וניקוד, עדכון פרטים אישיים
 import userService from '../services/user.service.js';
 
 import { PrismaClient } from '@prisma/client';

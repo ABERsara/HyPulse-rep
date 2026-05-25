@@ -4,7 +4,6 @@
 
 expo-env.d.ts
 # @end expo-cli
+
 # Security & Environment
 .env.development
-
-*.json

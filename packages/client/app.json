@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "bundleIdentifier": "com.yourname.worldplay", 
+      "bundleIdentifier": "com.hypulse.app",
       "supportsTablet": true,
       "bitcode": false,
       "infoPlist": {
@@ -37,7 +37,7 @@
         "android.permission.WAKE_LOCK",
         "android.permission.BLUETOOTH"
       ],
-     "package": "com.yourname.worldplay",
+      "package": "com.hypulse.app",
   "versionCode": 1
     },
     "web": {

@@ -2,6 +2,7 @@
 // ✅ כלי עזר לסנכרון real-time של יתרות משתמשים
 
 import { PrismaClient } from '@prisma/client';
+import { SOCKET_EVENTS } from '@worldplay/shared';
 
 /**
  * שידור עדכון יתרה לכל המשתמשים המעורבים
@@ -32,7 +33,6 @@ export async function syncUserBalances(io, userIds) {
         select: {
           id: true,
           walletBalance: true,
-          walletDiamonds: true,
         },
       });
 
@@ -40,24 +40,22 @@ export async function syncUserBalances(io, userIds) {
         // המרת Decimal ל-Number לשידור
         const balanceData = {
           newBalance: Number(user.walletBalance),
-          diamonds: Number(user.walletDiamonds),
-          timestamp: new Date().toISOString(),
         };
 
         // שידור לחדר הפרטי של המשתמש
-        io.to(userId).emit('wallet:updated', balanceData);
+        io.to(userId).emit(SOCKET_EVENTS.WALLET.BALANCE_UPDATE, balanceData);
 
         console.log(
-          `[SOCKET] ✅ Updated balance for user ${userId}: ${balanceData.newBalance}`
+          `[SOCKET]  Updated balance for user ${userId}: ${balanceData.newBalance}`
         );
       } else {
-        console.warn(`[SOCKET] ⚠️ User ${userId} not found`);
+        console.warn(`[SOCKET]  User ${userId} not found`);
       }
     }
 
     console.log('[SOCKET] Balance sync completed');
   } catch (error) {
-    console.error('[SOCKET] ❌ Error syncing balances:', error.message);
+    console.error('[SOCKET]  Error syncing balances:', error.message);
   } finally {
     await prisma.$disconnect();
   }

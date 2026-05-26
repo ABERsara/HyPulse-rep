@@ -100,3 +100,24 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'שגיאת שרת בעת ההתחברות' });
   }
 };
+
+
+export const socialLogin = async (req, res) => {
+  try {
+    const { firebaseToken } = req.body;
+
+    if (!firebaseToken) {
+      return res.status(400).json({ message: 'נדרש Firebase token' });
+    }
+
+    // TODO (T32): const decoded = await admin.auth().verifyIdToken(firebaseToken)
+    // TODO (T32): const user = await prisma.user.upsert({ where: { firebaseId: decoded.uid }, ... })
+    // TODO (T32): const jwt = sign({ id: user.id }, process.env.JWT_SECRET)
+    // TODO (T32): return res.json({ token: jwt, user })
+
+    res.status(501).json({ message: 'לא מומש עדיין — T32 ישלים זאת' });
+  } catch (err) {
+    console.error('[socialLogin]', err);
+    res.status(500).json({ message: 'שגיאת אימות' });
+  }
+};

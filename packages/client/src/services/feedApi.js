@@ -1,3 +1,5 @@
+import { handleResponse } from './apiHelpers';
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const feedApi = {
@@ -5,12 +7,6 @@ export const feedApi = {
     const response = await fetch(
       `${BASE_URL}/api/feed/public?page=${page}&limit=${limit}`
     );
-
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(body.message || `Server error: ${response.status}`);
-    }
-
-    return response.json();
+    return handleResponse(response);
   },
 };

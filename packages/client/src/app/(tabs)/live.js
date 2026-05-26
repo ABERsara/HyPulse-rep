@@ -1,18 +1,18 @@
 import { View, Text } from 'react-native';
-
+import StreamCard from '../components/StreamCard';
 export default function LiveScreen() {
   return (
     <View
-      style={{
+        style={{
         flex: 1,
         backgroundColor: '#1a1a1a',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Text style={{ color: '#06b6d4', fontSize: 18, fontWeight: 'bold' }}>
-        LIVE — Coming Soon
-      </Text>
+  <View style={{ width: '100%' }}> 
+        <StreamCard onPress={() => console.log('Card pressed!')} />
+      </View>
     </View>
   );
 }

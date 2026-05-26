@@ -1,6 +1,11 @@
-import { View, Text } from 'react-native';
+import { View, Text, Button } from 'react-native';
+import LazyAuthModal from '../../components/LazyAuthModal.js';
+import { useState } from 'react';
 
 export default function ProfileScreen() {
+
+  const [isVisible, setIsVisible] = useState(false);
+
   return (
     <View
       style={{
@@ -11,6 +16,10 @@ export default function ProfileScreen() {
       }}
     >
       <Text style={{ color: '#fff', fontSize: 18 }}>Profile — Coming Soon</Text>
+
+      <Button title='visible' onPress={() => setIsVisible(!isVisible)}></Button>
+      <LazyAuthModal onClose={() => setIsVisible(false)} visible={isVisible}></LazyAuthModal>
+
     </View>
   );
 }

@@ -11,9 +11,9 @@ const REQUIRED_VARS = [
 export function validateEnv() {
   const missing = REQUIRED_VARS.filter((key) => !process.env[key]);
   if (missing.length > 0) {
-    console.error('הודעה מתאימה באנגלית');
+    console.error('❌ Missing required environment variables!');
     missing.forEach((key) => console.error(`   - ${key}`));
     process.exit(1);
   }
-  console.log('הודעה מתאימה באנגלית');
+  console.log('✅ All environment variables are set successfully.');
 }

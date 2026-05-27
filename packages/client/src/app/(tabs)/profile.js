@@ -17,7 +17,6 @@ export default function ProfileScreen() {
     >
       <Text style={{ color: '#fff', fontSize: 18 }}>Profile — Coming Soon</Text>
 
-      <Button title='visible' onPress={() => setIsVisible(!isVisible)}></Button>
       <LazyAuthModal onClose={() => setIsVisible(false)} visible={isVisible}></LazyAuthModal>
 
     </View>

@@ -88,3 +88,5 @@ postman/
 
 # Firebase service account (if used locally)
 firebase-service-account.json
+
+.infisical.json

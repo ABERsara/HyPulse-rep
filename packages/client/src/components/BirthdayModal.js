@@ -1,7 +1,7 @@
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-typesgit log';
 
 export default function BirthdayModal({ visible, onConfirm }) {
   const [date, setDate] = useState(new Date(2000, 0, 1));

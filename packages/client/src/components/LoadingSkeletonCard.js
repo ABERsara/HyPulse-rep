@@ -2,15 +2,21 @@ import { View, StyleSheet, Text } from 'react-native';
 
 export default function LoadingSkeletonCard() {
     return (
-        <View style={styles.card}>
-            <View style={styles.title} >
-                <Text>title</Text>
+        <View>
+            <View style={styles.card}>
+                <View style={styles.thumbnail} />
+                <View style={styles.title} />
+                <View style={styles.host} />
             </View>
-            <View style={styles.host}  >
-                <Text>host name</Text>
+            <View style={styles.card}>
+                <View style={styles.thumbnail} />
+                <View style={styles.title} />
+                <View style={styles.host} />
             </View>
-            <View style={styles.thumbnail}  >
-                <Text>thumbnail</Text>
+            <View style={styles.card}>
+                <View style={styles.thumbnail} />
+                <View style={styles.title} />
+                <View style={styles.host} />
             </View>
         </View>
     );

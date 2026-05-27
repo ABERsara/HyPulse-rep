@@ -8,7 +8,7 @@ export const SOCKET_EVENTS = {
   },
   // Wallet events (App-Server)
   WALLET: {
-    BALANCE_UPDATE: 'wallet:balance_update',
+    BALANCE_UPDATE: 'balance_update',
   },
   // Game events (App-Server)
   GAME: {

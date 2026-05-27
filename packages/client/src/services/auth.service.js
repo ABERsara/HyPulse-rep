@@ -31,7 +31,7 @@ export const authService = {
       await AsyncStorage.setItem('userToken', data.token);
       return {
         token: data.token,
-        user: data.user, // { id, name, username, email, role }
+        user: data.user,
       };
     }
 

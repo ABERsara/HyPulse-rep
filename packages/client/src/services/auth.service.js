@@ -46,6 +46,11 @@ export const authService = {
     }
   },
 
+  isAuthenticated: async () => {
+    const token = await authService.getToken();
+    return token !== null;
+  },
+
   logout: async () => {
     try {
       await AsyncStorage.removeItem('userToken');

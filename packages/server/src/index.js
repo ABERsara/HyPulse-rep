@@ -17,6 +17,7 @@ import cors from 'cors';
 import http from 'http';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { validateEnv } from './config/validateEnv.js';
 
 import userRoutes from './routes/user.routes.js';
 import financeRoutes from './routes/finance.routes.js';
@@ -44,6 +45,7 @@ import admin from './config/firebase.js';
 console.log(admin.app().name);
 
 dotenv.config();
+validateEnv();
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8080;

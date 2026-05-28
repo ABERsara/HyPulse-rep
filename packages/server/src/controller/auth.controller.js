@@ -101,7 +101,6 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const socialLogin = async (req, res) => {
   try {
     const { firebaseToken } = req.body;

@@ -1,4 +1,4 @@
-// ניהול פרופיל המשתמש — שליפת יתרה וניקוד, עדכון פרטים אישיים
+//     ניהול פרופיל המשתמש — שליפת יתרה וניקוד, עדכון פרטים אישיים
 import userService from '../services/user.service.js';
 
 import { PrismaClient } from '@prisma/client';
@@ -11,6 +11,11 @@ export const getMe = async (req, res) => {
     const userProfile = await prisma.user.findUnique({
       where: { id: userId },
       select: {
+        id: true,
+        username: true,
+        name: true,
+        email: true,
+        dateOfBirth: true, // השדה החדש מהמיגרציה של T11
         walletBalance: true,
         participations: {
           where: { game: { status: 'ACTIVE' } },
@@ -27,6 +32,11 @@ export const getMe = async (req, res) => {
     });
 
     res.json({
+      id: userProfile.id,
+      username: userProfile.username,
+      name: userProfile.name,
+      email: userProfile.email,
+      dateOfBirth: userProfile.dateOfBirth,
       walletCoins: Number(userProfile.walletBalance),
       scoresByGame: scoresByGame,
     });

@@ -8,7 +8,7 @@
  *   /api/users, /api/user-answers, /api/finance, /api/streams
  *   /api/games, /api/questions, /api/analytics, /api/notifications
  *   /api/chat, /api/payments, /api/economy, /api/inbox, /api/follows
- *   /api/config, / (status)
+ *   /api/auth, /api/feed, /api/config, / (status)
  *
  * TODO: cors origin: '*' — יש להגביל לדומיין הידוע לפני פרודקשן
  */
@@ -40,6 +40,7 @@ import { handleWebhook } from './payments/payments.webhook.js';
 import inboxRoutes from './routes/inbox.routes.js';
 import followRoutes from './routes/follow.routes.js';
 import feedRoutes from './routes/feed.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 validateEnv();
@@ -76,6 +77,7 @@ app.use('/api/economy', economyRoutes);
 app.use('/api/inbox', inboxRoutes);
 app.use('/api/follows', followRoutes);
 app.use('/api/feed', feedRoutes);
+app.use('/api/auth', authRoutes);
 
 // --- Functions ---
 async function checkMediaServer() {

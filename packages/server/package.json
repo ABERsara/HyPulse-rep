@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
+    "firebase-admin": "^13.10.0",
     "jsonwebtoken": "^9.0.3",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",

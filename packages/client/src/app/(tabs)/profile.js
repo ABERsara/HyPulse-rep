@@ -1,4 +1,4 @@
-import { View, Text, Button } from 'react-native';
+import { View, Text } from 'react-native';
 import LazyAuthModal from '../../components/LazyAuthModal.js';
 import { useState } from 'react';
 

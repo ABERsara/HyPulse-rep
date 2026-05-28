@@ -51,6 +51,27 @@ export const authService = {
     return token !== null;
   },
 
+  loginWithFacebook: async () => {
+    // TODO: requires expo-auth-session and firebase packages
+    // Step 1: פתיחת חלון Facebook login
+    // const result = await FacebookAuthProvider.signInWithPopup(...);
+
+    // Step 2: קבלת Facebook access token
+    // const { accessToken } = result.credential;
+
+    // Step 3: המרה ל-Firebase credential
+    // const firebaseCredential = FacebookAuthProvider.credential(accessToken);
+    // const firebaseResult = await signInWithCredential(auth, firebaseCredential);
+    // const firebaseToken = await firebaseResult.user.getIdToken();
+
+    // Step 4: שליחה ל-loginWithSocial
+    // return authService.loginWithSocial(firebaseToken);
+
+    throw new Error(
+      'loginWithFacebook: requires firebase and expo-auth-session setup (T40)'
+    );
+  },
+
   logout: async () => {
     try {
       await AsyncStorage.removeItem('userToken');

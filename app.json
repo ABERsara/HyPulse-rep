@@ -2,5 +2,8 @@
   "android": {
     "usesCleartextTraffic": true,
     "package": "com.anonymous.worldplayroot"
-  }
+  },
+  "plugins": [
+    "@react-native-community/datetimepicker"
+  ]
 }

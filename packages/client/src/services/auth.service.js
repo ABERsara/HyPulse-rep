@@ -10,6 +10,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/users`;
+const AUTH_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/auth`;
 
 export const authService = {
   login: async (email, password) => {
@@ -44,6 +45,27 @@ export const authService = {
     } catch {
       return null;
     }
+  },
+
+  loginWithSocial: async (firebaseToken) => {
+    const response = await fetch(`${AUTH_URL}/social`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firebaseToken }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Social login failed');
+    }
+
+    if (data.token) {
+      await AsyncStorage.setItem('userToken', data.token);
+      return { token: data.token, user: data.user };
+    }
+
+    throw new Error('No token received from server');
   },
 
   isAuthenticated: async () => {

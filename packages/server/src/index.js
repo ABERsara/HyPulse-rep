@@ -41,9 +41,6 @@ import inboxRoutes from './routes/inbox.routes.js';
 import followRoutes from './routes/follow.routes.js';
 import feedRoutes from './routes/feed.routes.js';
 
-import admin from './config/firebase.js';
-console.log(admin.app().name);
-
 dotenv.config();
 validateEnv();
 const app = express();

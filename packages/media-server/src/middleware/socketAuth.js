@@ -18,11 +18,12 @@ export const socketAuth = async (socket, next) => {
     });
 
     if (!user) return next(new Error('Not authorized: User not found'));
-    if (!user.isActive) return next(new Error('Not authorized: User is banned'));
+    if (!user.isActive)
+      return next(new Error('Not authorized: User is banned'));
 
     socket.user = user;
     next();
-  } catch (err) {
+  } catch {
     return next(new Error('Not authorized: Invalid token'));
   }
 };

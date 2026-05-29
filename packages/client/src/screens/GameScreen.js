@@ -1119,7 +1119,10 @@ const GameScreen = ({ gameId: gameIdProp }) => {
     };
     const s = getAppSocket();
     if (s) s.on('balance_update', onUpdate);
-    return () => { const s2 = getAppSocket(); if (s2) s2.off('balance_update', onUpdate); };
+    return () => {
+      const s2 = getAppSocket();
+      if (s2) s2.off('balance_update', onUpdate);
+    };
   }, [resolvedGameId, dispatch]);
 
   const tabs = [

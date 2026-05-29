@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
-import { getMediaSocket, connectMediaSocket, emitMediaPromise, connectAppSocket, emitPromise } from '../services/socket.service';
+import {
+  getMediaSocket,
+  connectMediaSocket,
+  emitMediaPromise,
+  connectAppSocket,
+  emitPromise,
+} from '../services/socket.service';
 import { MediasoupManager } from '../services/MediasoupManager';
 import { SOCKET_EVENTS } from '@worldplay/shared';
 
@@ -28,7 +34,10 @@ export default function ViewerTestScreen() {
       if (gameId) {
         try {
           await connectAppSocket();
-          await emitPromise(SOCKET_EVENTS.GAME.JOIN, { gameId, role: 'VIEWER' });
+          await emitPromise(SOCKET_EVENTS.GAME.JOIN, {
+            gameId,
+            role: 'VIEWER',
+          });
         } catch (e) {
           console.warn('Viewer DB registration failed:', e.message);
         }

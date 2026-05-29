@@ -15,7 +15,6 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
-import dotenv from 'dotenv';
 import axios from 'axios';
 import { validateEnv } from './config/validateEnv.js';
 
@@ -42,7 +41,6 @@ import followRoutes from './routes/follow.routes.js';
 import feedRoutes from './routes/feed.routes.js';
 import authRoutes from './routes/auth.routes.js';
 
-dotenv.config();
 validateEnv();
 const app = express();
 const server = http.createServer(app);

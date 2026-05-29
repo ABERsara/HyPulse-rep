@@ -76,6 +76,12 @@ test.sh
 proxy.js
 TIP.txt
 
+# Private planning & sprint files (local only)
+SPRINT1_BOARD.md
+SPRINT1_TRACKER.md
+jira-import.json
+scripts/
+
 # Postman
 postman/
 .postman/

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function ErrorState({ onRetry }) {
@@ -11,11 +12,19 @@ export default function ErrorState({ onRetry }) {
     </View>
   );
 }
+ErrorState.propTypes = {
+  onRetry: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emoji: { fontSize: 40, marginBottom: 12 },
   message: { color: '#9ca3af', fontSize: 16, marginBottom: 20 },
-  btn: { backgroundColor: '#374151', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
+  btn: {
+    backgroundColor: '#374151',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
   btnText: { color: '#fff', fontWeight: 'bold' },
 });

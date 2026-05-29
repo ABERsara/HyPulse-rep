@@ -18,7 +18,7 @@
       }
     },
     "android": {
-       "adaptiveIcon": {
+      "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
@@ -38,7 +38,7 @@
         "android.permission.BLUETOOTH"
       ],
       "package": "com.hypulse.app",
-  "versionCode": 1
+      "versionCode": 1
     },
     "web": {
       "output": "static",

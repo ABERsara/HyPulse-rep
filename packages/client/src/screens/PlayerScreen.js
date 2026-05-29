@@ -38,7 +38,10 @@ export default function PlayerScreen({ streamId }) {
 
     const s = getAppSocket();
     if (s) s.on('stream:new_producer', handleNewProducer);
-    return () => { const s2 = getAppSocket(); if (s2) s2.off('stream:new_producer', handleNewProducer); };
+    return () => {
+      const s2 = getAppSocket();
+      if (s2) s2.off('stream:new_producer', handleNewProducer);
+    };
   }, []);
 
   return (
